@@ -1,3 +1,9 @@
+/* Authors: Clayton Broman, Jakub Czachor
+   Project: Assembly Code Compiler
+   Date: 3/01/2021
+   Course: CSCI 360 
+   Professor: Xiaojie Zhang
+*/
 #include <iostream> 
 #include <fstream> 
    
