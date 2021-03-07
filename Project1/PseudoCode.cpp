@@ -7,45 +7,23 @@
 #include <iostream> 
 #include <fstream> 
    
- 
-    using 
-    namespace 
-    std;  
-   
- 
-       
-   
- 
-    int 
-    main( 
-    int 
-    argc,  
-    char 
-    ** argv)  
-   
- 
-    {  
-   
- 
-     if(argc != 3 ){ //./compiler input_code.c output_code.s 
-   
+struct com{
+	string preamble = "main:\n\tpushq\t%rbp\n\tmoveq\t%rsp, %rbp\n";
+} line;
 
-     //check for input file 
-   
-
-     return error message 
-   
+int main( int argc,  char **argv){  
  
-       } 
+    if(argc != 3 ){ //./compiler input_code.c output_code.s 
+   	//check for input file 
+   	return error message 
+    } 
    
  
     ifstream in_code(argv[1] ); //open the file to read from 
+    ofstream out_code(argv[2] ); //open the assembly code file to write into 
    
 
-     ofstream out_code(argv[2] ); //open the assembly code file to write into 
-   
-
-     string line; 
+    string line; 
    
  
     //write the preamble 
