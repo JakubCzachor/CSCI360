@@ -47,7 +47,11 @@ int main( int argc,  char **argv){
 	    {
 		could be function declaration -> call funct_state(line)
 	        could be variable declaration -> call var_dec(line);
-	    } 
+	    }
+	    if starts with "while"
+	    {
+		call while_state(line); 
+	    }
 	    if starts with "if"
 	    {
                 call if_state(line);
@@ -60,10 +64,70 @@ int main( int argc,  char **argv){
 	    {
 	    	call arith_state(line);
 	    }
+	    if starts with "class":
+	    {
+		call class_state(line);
+	    }
 	}	    
     
-   
- 
+    for the navigation throughout functions {
+	    
+    	line_end(string)
+    	{
+		if ";",  move down line
+    	} 
+
+    	curly_start(string)
+    	{ 
+		if "{" start of new function
+    	}
+
+    	curly_end(string);
+    	{
+		if "}" end function
+    	}
+	    
+    }
+
+
+    for in line arithmetic{ 
+	    
+	if "=" //need to also check !"=="
+	{
+		set_equal(a,b); 
+	}
+	if !"=" && "=="
+	{
+		check_equal(a,b);
+	}
+	if "+"
+	{
+		addi(a,b);
+	}
+	if "-"
+	{
+		sub(a,b);
+	}
+	if "*"
+	{
+		mult(a,b);
+	}
+	if "/" 
+	{
+		div(a,b);
+	}
+	if "++"
+	{
+		addi(a,1);
+	}
+	if "--"
+	{
+		sub(a,1);
+	}
+	  
+	   
+    }
+	
     //write the preamble 
    
 
