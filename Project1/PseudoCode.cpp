@@ -1,6 +1,7 @@
 /* Authors: Clayton Broman, Jakub Czachor
    Project: Assembly Code Compiler
    Date: 3/01/2021
+   Due data: 3/23/2021
    Course: CSCI 360 
    Professor: Xiaojie Zhang
 */
@@ -11,9 +12,11 @@ struct com{
 	string preamble = "main:\n\tpushq\t%rbp\n\tmoveq\t%rsp, %rbp\n";
 } line;
 
+//function statements - for a line that calls a function. 
 int funct_state(string line){
 	write preamle
-	parse the line for:
+	parse the line
+ 	for:
 	{
 	   return_type;
 	   find first space;
@@ -26,8 +29,9 @@ int funct_state(string line){
 int var_dec(string line){
 	parse for spaces or "\)": 
 
-	if int -> size=8;
-	
+	if int -> size=4;
+}
+int 
 
 
 int main( int argc,  char **argv){  
@@ -48,10 +52,9 @@ int main( int argc,  char **argv){
 		could be function declaration -> call funct_state(line)
 	        could be variable declaration -> call var_dec(line);
 	    }
-	    if starts with "while"
-	    {
-		call while_state(line); 
-	    }
+	    
+	    //leaving out while loop 
+
 	    if starts with "if"
 	    {
                 call if_state(line);

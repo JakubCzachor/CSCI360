@@ -6,15 +6,63 @@
 */
 #include <iostream> 
 #include <fstream> 
- 
+#include <vector>
+#include <list> 
+
 using namespace std;  
 
+struct function{
+	//default function 
+	string funct_name;
+	string ret_type;
+	vector<string> assem_instrs;
+	bool no_more;
+};
+
+void funct_dec(string line)
+{
+    function funct;
+    int start, end;
+
+    funct.ret_type = line.substr(0,line.find(' '));
+    string temp = line.substr(line.find(' ')+1, line.length());
+    funct.funct_name = temp.substr(0, temp.find('('));
+    funct.assem_instrs.push_back(funct.funct_name + ":");
+    funct.assem_instrs.push_back("pushq %rbp");
+    funct.assem_instrs.push_back("movq %rsp,%rbp");
+    funct.no_more = true;
+    return;
+}
+
+bool is_funct_dec(string line)
+{
+    if(line.find("int")<line.length() && line.find("(") <line.length() )
+    {
+        return true;
+    }
+    else if( line.find("void")<line.length() && line.find("(") <line.length() )
+    {
+	return true;
+    }
+    else if( line.find("string")<line.length() && line.find("(") <line.length() )
+    {
+	return true;
+    }
+    else if( line.find("bool")<line.length() && line.find("(") <line.length() )
+    {
+	return true;
+    }
+
+    else return false;
+}
 
 int main(int argc, char ** argv)  
-    {  
+{   
+    list<string> funct_table;
+
     if(argc != 3 ){ //./compiler input_code.c output_code.s 
     //check for input file 
-         cout<<"incorrect number of input arguments requires input and output files\n";
+         cout<<"incorrect number of input arguments, 2 required: input and output files\n";
 	 return 1;
     }
     string preamble = "main:\n\tpushq\t%rbp\n\tmoveq\t%rsp, %rbp\n";
@@ -24,25 +72,63 @@ int main(int argc, char ** argv)
     string line; 
    
     //write the preamble 
-    out_code << preamble;
+    //out_code << preamble; // maybe should be part of funct handler
 
-     while(getline(in_code, line)){ //iterate over every line in input file 
-          out_code << "\tline\n";
+    while(getline(in_code, line)) //iterate over every line in input file 
+    {  
+	out_code << line << "\n"; //for debug
+    	
+    	if( line.find("int")==0 && line.find(";")==line.length()-1)
+	{
+	    //found variable declaration
+	    //
+	    out_code<<"var dec\n";
+	    //varable_dec(line);
+	}
+	else if(line.find("if")<line.length())
+	{
+	    //found an if statement
+	    //
+	    out_code<<line.find("if")<<"\n";
+	    out_code<<"if_state\n";
+	    //if_state(line);
+	}
+	else if(line.find("for")<line.length())
+	{
+	    //found for statement
+	    out_code << "for state\n";
 
-     // bulk of the work for next time 
+	    //for_state(line);
+	}
+	else if(line.find("return")<line.length())
+	{
+	    //found return statement
+	    out_code << "return\n";
+	    //return_state(line);
+	}
+	else if( is_funct_dec(line) == true )
+	{
+	    //found function declaration
+	    //
+	    out_code<< "found a funct dec\n";
+	    funct_dec(line);
+	}
+	else{
+	    //arithmetic instructions
+	    //
+	    out_code<<"arithmetic instr\n";
+	    //arith_state( line );
+        }
    
 
-     // 
+    } 
    
 
-     } 
-   
+    //write the post script 
+    //out_code << "\tpopq\t%rbp\n\tret\n"; // handle in fuct handler
 
-     //write the post script 
-     out_code << "\tpopq\t%rbp\n\tret\n";
-
-     in_code.close(); 
-     out_code.close(); 
+    in_code.close(); 
+    out_code.close(); 
    
-return 0;
+    return 0;
 }
