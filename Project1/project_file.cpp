@@ -19,6 +19,17 @@ struct function{
 	bool no_more;
 };
 
+void trim_tabs_spaces(string& in_str){
+	string temp = in_str;
+	int i=0;
+	for(i;i<temp.length();i++)
+	{
+		if(temp[i] == ' ' || temp[i] == '\t' )  continue;
+		else break;
+	}
+	in_str = temp.substr(i,temp.length());
+}
+
 void funct_dec(string line)
 {
     function funct;
@@ -76,9 +87,9 @@ int main(int argc, char ** argv)
 
     while(getline(in_code, line)) //iterate over every line in input file 
     {  
-	out_code << line << "\n"; //for debug
-    	
-    	if( line.find("int")==0 && line.find(";")==line.length()-1)
+        trim_tabs_spaces(line);
+	if( line.length() ==0) continue;
+	else if( line.find("int")==0 && line.find(";")==line.length()-1)
 	{
 	    //found variable declaration
 	    //
@@ -120,6 +131,7 @@ int main(int argc, char ** argv)
 	    //arith_state( line );
         }
    
+	out_code << line << "\n"; //for debug
 
     } 
    

@@ -1,18 +1,12 @@
+found a funct dec
 void func(){
-found a funct dec
-
 arithmetic instr
 }
-arithmetic instr
-
-arithmetic instr
+found a funct dec
 int main(){
-found a funct dec
-	int a,b,c,d;
+var dec
+int a,b,c,d;
 arithmetic instr
-	func();
+func();
 arithmetic instr
 }
-arithmetic instr
-
-arithmetic instr
