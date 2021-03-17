@@ -8,8 +8,17 @@
 #include <fstream> 
 #include <vector>
 #include <list> 
+#include <iterator>
 
 using namespace std;  
+struct ItLine{
+	string word;
+	operator string const&() const{return word;}
+	friend istream& operator>>(istream& stream, ItLine& line){
+		return getline(stream, line.word);
+	}
+	
+};
 
 struct function{
 	//default function 
@@ -45,7 +54,7 @@ void funct_dec(string line)
     return;
 }
 
-bool is_funct_dec(string line)
+bool is_funct_dec(const string& line)
 {
     if(line.find("int")<line.length() && line.find("(") <line.length() )
     {
@@ -84,11 +93,19 @@ int main(int argc, char ** argv)
    
     //write the preamble 
     //out_code << preamble; // maybe should be part of funct handler
+    //istream_iterator<string> fin(in_code);
+    istream_iterator<string> eof;
+    vector<string> v_line( istream_iterator<ItLine>{in_code}, istream_iterator<ItLine>{});
 
-    while(getline(in_code, line)) //iterate over every line in input file 
+    for(int i=0;i<3;i++ ) //getline(in_code, line)) //iterate over every line in input file 
     {  
+
+	out_code<<v_line[i]<<"\n";
+	
+	continue;
+	out_code<<"did i get here?";
         trim_tabs_spaces(line);
-	if( line.length() ==0) continue;
+	if( line.length() ==0) continue;  //skip blank lines
 	else if( line.find("int")==0 && line.find(";")==line.length()-1)
 	{
 	    //found variable declaration
