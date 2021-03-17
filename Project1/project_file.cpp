@@ -152,7 +152,106 @@ int main(int argc, char ** argv)
 
     } 
    
+void arith_state(line){
 
+	int equalFind = line.find("="); //finds equal sign
+	int incrementFind = line.find("++"); //finds addition
+	int decrementFind = line.find("--"); //finds decrement
+	int multFind = line.find("*"); //finds *
+	int divFind = line.find("/"); //finds /
+	int addFind = line.find("+"); //finds +
+	int subFind = line.find("-"); //finds -
+	int lineEnd = line.find(";"); //finds end
+	int var0ArrayFindLeft; 
+	int var0ArrayFindRight;
+		
+	string var0; //original variable;
+		
+	if((line[equalFind-1] != "=" || line[equalFind+1] != "=") && (incrementFind == -1) && (decrementFind == -1){ //checks to see != "==" && != "++" or "--"
+		
+		var0 = line.substr(0,equalFind); //first variable
+		var0ArrayFindLeft = var0.find("["); //finds left bracket
+		var0ArrayFindRight = var0.find("]"); //finds right bracket 
+			
+		if((arrayFindLeft == -1)) && (arrayFindRight == -1){ //not an array
+			
+			if(multFind != -1 || divFind != -1){ //multiplication or division is present
+				
+				if((multFind == -1) && divFind != -1){//division is present
+					string var1 = line.subtr(equalFind+1,divFind-1); //finds b in a=b/c;
+					string var2 = line.subtr(divFind+1, lineEnd-1); //finds c in a=b/c;
+			
+					//division of variables
+				}
+				else if((multFind != -1) && (divFind == -1)){ //multiplication is present
+					string var1 = line.subtr(equalFind+1, multFind -1); //finds b in a=b*c
+					string var2 = line.subtr(multFind+1, lineEnd -1); //finds c in a=b*c
+						
+					//multiplication of variables
+				}
+        
+			}
+			else if((subFind != -1) || (addFind != -1)){ //addition or subtraction is present
+				
+        			if((subFind == -1) && (addFind != -1){ //addition is present
+					string var1 = line.subtr(equalFind+1, addFind -1); //finds b in a=b+c
+					string var2 = line.subtr(addFind+1, lineEnd -1); //finds c in a=b+c
+						
+					//push addl
+				}
+				else if((addFind == -1)&& (subFind != -1)){ //subtraction is present
+					string var1 = line.subtr(equalFind+1, subFind -1); //finds b in a=b-c
+					string var2 = line.subtr(subFind+1, lineEnd -1); //finds c in a=b-c
+						
+					//push subl
+				}
+					
+			}
+			else{//Neither is present, other state -> x=y
+				string var2 = line.subtr(equalFind, line.length()); 
+				int var2ArrayFindLeft = var2.find("[");
+				int var2ArrayFindRight = var2.find("]");
+				if((var2ArrayFindLeft == -1) && (var2ArrayFindRight == -1)){ //not an array
+					//set two variables equal to each other
+				}
+				else{ //y is a variable
+					string var2Array = var2.subtr(var2ArrayFindLeft+1, var2ArrayFindRight-1); //var2Array => z in x = y[z]
+					//set variable equal to number in an array
+				}
+			}
+				
+				
+		}
+		else{ //var0 is an array && "=" operation
+
+
+
+				
+		}
+	}
+	
+		
+	else if(line[equalFind-1] == "=" || line[equalFind+1] != "="){ //"== operation"
+		
+			
+	}
+	else if((equalFind == -1) && (incrementFind != -1)){ //Increments Variable
+		var0 = line.subtr(0, incrementFind);
+			
+	}
+	else if((equalFind == -1) && (decrementFind != -1)){ //Decrements Variable
+			var0 = line.subtr(0, decrementFind); 
+			
+	}
+	else{ //not "=", "==", "++", or "--"
+
+			
+	}
+		
+		
+}
+
+   
     //write the post script 
     //out_code << "\tpopq\t%rbp\n\tret\n"; // handle in fuct handler
 
