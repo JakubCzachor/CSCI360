@@ -1,5 +1,5 @@
 void func(){
-
+    1+1=2;
 }
 
 int main(){
