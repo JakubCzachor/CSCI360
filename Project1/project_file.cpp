@@ -4,14 +4,21 @@
    Course: CSCI 360 
    Professor: Xiaojie Zhang
 */
-#include <iostream> 
-#include <fstream> 
+#include <iostream>
+#include <fstream>
 #include <vector>
 #include <list> 
 #include <iterator>
+//#include "project_file.h"
 
 using namespace std; 
+string trim_tabs_spaces( string  in_str );
+ostream& coarse_parse(ostream &out_code, const vector<string> &v_code, int &line_cntr);
+ostream& funct_dec(ostream &out_code,const vector<string> &v_code, int &cntr); 
+bool is_funct_dec(const string& line);
 
+
+/* not working
 void arith_state(string& line){
 
 	int equalFind = line.find("="); //finds equal sign
@@ -27,7 +34,7 @@ void arith_state(string& line){
 		
 	string var0; //original variable;
 		
-	if((line[equalFind-1] != "=" || line[equalFind+1] != "=") && (incrementFind == -1) && (decrementFind == -1)){ //checks to see != "==" && != "++" or "--"
+	if((incrementFind == -1) && (decrementFind == -1)){ //checks to see != "==" && != "++" or "--" (== is comparitor)
 		
 		var0 = line.substr(0,equalFind); //first variable
 		var0ArrayFindLeft = var0.find("["); //finds left bracket
@@ -91,10 +98,10 @@ void arith_state(string& line){
 	}
 	
 		
-	else if(line[equalFind-1] == "=" || line[equalFind+1] != "="){ //"== operation"
+	//else if(line[equalFind-1] == "=" || line[equalFind+1] != "="){ //"== operation"
 		
 			
-	}
+	//}
 	else if((equalFind == -1) && (incrementFind != -1)){ //Increments Variable
 		var0 = line.subtr(0, incrementFind);
 			
@@ -110,15 +117,8 @@ void arith_state(string& line){
 		
 		
 }
+*/
 
-struct ItLine{
-	string word;
-	operator string const&() const{return word;}
-	friend istream& operator>>(istream& stream, ItLine& line){
-		return getline(stream, line.word);
-	}
-	
-};
 
 struct function{
 	//default function 
@@ -128,7 +128,8 @@ struct function{
 	bool no_more;
 };
 
-void trim_tabs_spaces(string& in_str){
+string trim_tabs_spaces( string  in_str ){
+	
 	string temp = in_str;
 	int i=0;
 	for(i;i<temp.length();i++)
@@ -136,14 +137,74 @@ void trim_tabs_spaces(string& in_str){
 		if(temp[i] == ' ' || temp[i] == '\t' )  continue;
 		else break;
 	}
-	in_str = temp.substr(i,temp.length());
+	return temp.substr(i,temp.length());
 }
 
-void funct_dec(string line)
+ostream& coarse_parse(ostream &out_code, const vector<string> &v_code, int &line_cntr)
+{	
+	cout<<line_cntr;
+	string line = v_code[ line_cntr ];
+        //continue;	
+	if( line.find("int")==0 && line.find(";")==line.length()-1)
+	{
+	    //found variable declaration
+	    //
+	    out_code<<line.find("int")<<" var dec\n";
+	    //varable_dec(line);
+	    line_cntr++;
+	}
+	else if( line.find("if")<line.length())
+	{
+	    //found an if statement
+	    //
+	    out_code<< line.find("if")<<"\n";
+	    out_code<<"if_state\n";
+	    line_cntr++;
+	    //if_state(line);
+	}
+	else if( line.find("for")<line.length())
+	{
+	    //found for statement
+	    out_code << "for state\n";
+
+	    line_cntr++;
+	    //for_state(line);
+	}
+	else if( line.find("return")<line.length())
+	{
+	    //found return statement
+	    out_code << "return\n";
+	    //return_state(line);
+	    line_cntr++;
+	}
+	else if( is_funct_dec( line ) == true )
+	{
+	    //found function declaration
+	    //
+	    out_code<< "found a funct dec\n";
+	    funct_dec(out_code, v_code, line_cntr);
+	    line_cntr++;
+	}
+	else{
+	    //arithmetic instructions
+	    //
+	    out_code<<"arithmetic instr\n";
+	    line_cntr++;
+	    //arith_state( line );
+        }
+        
+
+	//itt++;
+	//out_code << line_cntr << "\n"; //for debug
+
+	return out_code;
+} 
+
+ostream& funct_dec(ostream &out_code,const vector<string> &v_code, int &cntr) //function declaration statement 
 {
     function funct;
     int start, end;
-
+    string line = v_code[cntr];
     funct.ret_type = line.substr(0,line.find(' '));
     string temp = line.substr(line.find(' ')+1, line.length());
     funct.funct_name = temp.substr(0, temp.find('('));
@@ -151,16 +212,24 @@ void funct_dec(string line)
     funct.assem_instrs.push_back("pushq %rbp");
     funct.assem_instrs.push_back("movq %rsp,%rbp");
     funct.no_more = true;
-    return;
+    cntr++; //go to the next line in the file
+    line = v_code[cntr];
+    if( line.find('}') >= line.length())
+    {
+	    cout<<line<<"\n";
+	    coarse_parse(out_code, v_code, cntr);
+    } 
+        
+    return out_code;
 }
 
 bool is_funct_dec(const string& line)
 {
-    if(line.find("int")<line.length() && line.find("(") <line.length() )
+    if(line.find("int")<line.length() && line.find("(") <= line.length() )
     {
         return true;
     }
-    else if( line.find("void")<line.length() && line.find("(") <line.length() )
+    else if( line.find("void")<line.length() && line.find("(") <= line.length() )
     {
 	return true;
     }
@@ -175,7 +244,6 @@ bool is_funct_dec(const string& line)
 
     else return false;
 }
-
 int main(int argc, char ** argv)  
 {   
     list<string> funct_table;
@@ -195,69 +263,30 @@ int main(int argc, char ** argv)
     //out_code << preamble; // maybe should be part of funct handler
     //istream_iterator<string> fin(in_code);
     istream_iterator<string> eof;
-    vector<string> v_line( istream_iterator<ItLine>{in_code}, istream_iterator<ItLine>{});
-
-    for(int i=0;i<3;i++ ) //getline(in_code, line)) //iterate over every line in input file 
+    vector<string> v_code; 
+    //put input into a vector of strings 
+    while( getline(in_code, line) ){
+        string new_line = trim_tabs_spaces( line );
+	if( new_line.length() ==0) continue;  //skip blank lines
+	//cout<<new_line<<"\n";
+	v_code.push_back(new_line);
+    }
+    in_code.close(); 
+    //cout<<"v_code_size "<<v_code.size();
+    //vector<string>::iterator itt = v_line.begin();
+    int line_cntr = 0;
+    while( line_cntr < v_code.size() ) //getline(in_code, line)) //iterate over every line in input file 
     {  
-
-	out_code<<v_line[i]<<"\n";
-	
-	continue;
-	out_code<<"did i get here?";
-        trim_tabs_spaces(line);
-	if( line.length() ==0) continue;  //skip blank lines
-	else if( line.find("int")==0 && line.find(";")==line.length()-1)
-	{
-	    //found variable declaration
-	    //
-	    out_code<<"var dec\n";
-	    //varable_dec(line);
-	}
-	else if(line.find("if")<line.length())
-	{
-	    //found an if statement
-	    //
-	    out_code<<line.find("if")<<"\n";
-	    out_code<<"if_state\n";
-	    //if_state(line);
-	}
-	else if(line.find("for")<line.length())
-	{
-	    //found for statement
-	    out_code << "for state\n";
-
-	    //for_state(line);
-	}
-	else if(line.find("return")<line.length())
-	{
-	    //found return statement
-	    out_code << "return\n";
-	    //return_state(line);
-	}
-	else if( is_funct_dec(line) == true )
-	{
-	    //found function declaration
-	    //
-	    out_code<< "found a funct dec\n";
-	    funct_dec(line);
-	}
-	else{
-	    //arithmetic instructions
-	    //
-	    out_code<<"arithmetic instr\n";
-	    //arith_state( line );
-        }
-   
-	out_code << line << "\n"; //for debug
-
-    } 
-   
+	//out_code<< v_code[line_cntr] <<"\n";
+        //line = v_code[line_cntr];       
+        coarse_parse(out_code, v_code, line_cntr);
+    }
    
     //write the post script 
     //out_code << "\tpopq\t%rbp\n\tret\n"; // handle in fuct handler
 
-    in_code.close(); 
-    out_code.close(); 
-   
+    //out_code.close(); 
+    
     return 0;
 }
+

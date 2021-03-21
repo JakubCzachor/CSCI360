@@ -1,0 +1,5 @@
+#!/bin/bash
+make
+./comp example1.c example1.s
+vim example1.s
+
