@@ -1,10 +1,18 @@
 func:
 	pushq	%rbp
 	moveq	%rsp, %rbp
-	funct.var_declars here
-	funct.arith_opers here
+	doing arritmetic
+
+	popq	%rbp
+	ret
 main:
 	pushq	%rbp
 	moveq	%rsp, %rbp
-	funct.var_declars here
-	funct.arith_opers here
+	doing arritmetic
+
+	declare variables here
+	calling function func();
+	doing arritmetic
+
+	popq	%rbp
+	ret

@@ -14,7 +14,8 @@
 using namespace std; 
 struct function{
 	//default function 
-	string funct_name;
+	vector<string> funct_list; //keeper of all past function names
+	string funct_name; //keeper of the current function name
 	vector<int> mem_counter; //keep track of input arguments
 	string ret_type;
 	vector<string> assem_instrs;
@@ -29,15 +30,14 @@ ostream& coarse_parse(ostream &out_code, const vector<string> &v_code, int &line
 ostream& funct_dec(ostream &out_code,const vector<string> &v_code, int &cntr, function &funct); 
 bool is_funct_dec(const string& line);
 void var_dec(string line,const vector<string> &v_code,int & line_cntr,function &funct);
-
+void funct_call(string line,const vector<string> &v_code,int & line_cntr,function &funct);
 
 void arith_state(string line,const vector<string> &v_code,int & line_cntr,function &funct)
 {
 	//function 
 	line = v_code[line_cntr];
-	funct.assem_instrs.push_back("assem instrs\n");  //add instructions like this
-        line_cntr++;   //dont forget to cout up the line counter before returning
-	
+	funct.assem_instrs.push_back("doing arritmetic\n");  //add instructions like this
+        return;	
 	/*
 	int equalFind = line.find("="); //finds equal sign
 	int incrementFind = line.find("++"); //finds addition
@@ -151,16 +151,24 @@ string trim_tabs_spaces( string  in_str ){
 
 ostream& coarse_parse(ostream &out_code, const vector<string> &v_code, int &line_cntr, function &assem_instrs )
 {	
-	cout<<line_cntr;
+	cout<<"course parse cntr"<< line_cntr<<"\n"; //debug
 	string line = v_code[ line_cntr ];
-        //continue;	
-	if( line.find("int")==0 && line.find(";")==line.length()-1)
+        cout<<"course parse line "<<line<<"\n"; //debug
+
+	//seach for a function call (loops through all the functions added to the list)
+	for(auto i = assem_instrs.funct_list.begin(); i != assem_instrs.funct_list.end(); i++){
+		if( line.find(*i)==0 && line.find("(") < line.length()){
+		    //found a function call
+		    cout<<"stuck here?"<<"\n";//debug
+		    funct_call(line,v_code,line_cntr,assem_instrs);
+		}
+		
+	}
+        //search for variable declarations
+	if( line.find("int") ==0 && line.find(";")<line.length())
 	{
-	    //found variable declaration
-	    //
-	    //out_code<<line.find("int")<<" var dec\n";
+	    cout<<line.find("int")<<" var dec\n";  //debug
 	    var_dec(line,v_code,line_cntr,assem_instrs);
-	    line_cntr++;
 	}
 	else if( line.find("if")<line.length())
 	{
@@ -168,7 +176,6 @@ ostream& coarse_parse(ostream &out_code, const vector<string> &v_code, int &line
 	    //
 	    out_code<< line.find("if")<<"\n";
 	    out_code<<"if_state\n";
-	    line_cntr++;
 	    //if_state(line);
 	}
 	else if( line.find("for")<line.length())
@@ -176,7 +183,6 @@ ostream& coarse_parse(ostream &out_code, const vector<string> &v_code, int &line
 	    //found for statement
 	    out_code << "for state\n";
 
-	    line_cntr++;
 	    //for_state(line);
 	}
 	else if( line.find("return")<line.length())
@@ -184,29 +190,23 @@ ostream& coarse_parse(ostream &out_code, const vector<string> &v_code, int &line
 	    //found return statement
 	    out_code << "return\n";
 	    //return_state(line);
-	    line_cntr++;
 	}
+	//found function declaration
 	else if( is_funct_dec( line ) == true )
 	{
-	    //found function declaration
-	    //
-	    //out_code<< "found a funct dec\n";
+	    cout<< "found a funct dec\n";  //debug
 	    funct_dec(out_code, v_code, line_cntr, assem_instrs);
-	    line_cntr++;
+	    
 	}
 	else{
 	    //arithmetic instructions
 	    //
-	    //out_code<<"arithmetic instr\n";
+	    cout<<"arithmetic instr\n";
 	    //line_cntr++;
-	    
+	     
             arith_state( line,v_code,line_cntr, assem_instrs);
         }
         
-
-	//itt++;
-	//out_code << line_cntr << "\n"; //for debug
-
 	return out_code;
 } 
 
@@ -214,6 +214,7 @@ ostream& funct_dec(ostream &out_code,const vector<string> &v_code, int &cntr, fu
 {
     
     string preamble = "\tpushq\t%rbp\n\tmoveq\t%rsp, %rbp\n";
+    string epilogue =  "\tpopq\t%rbp\n\tret\n"; 
     //function funct;
     int start, end;
     string line = v_code[cntr];
@@ -224,31 +225,42 @@ ostream& funct_dec(ostream &out_code,const vector<string> &v_code, int &cntr, fu
 
     string temp = line.substr(line.find(' ')+1, line.length());
     funct.funct_name = temp.substr(0, temp.find('('));
-    funct.assem_instrs.push_back(funct.funct_name + ":");
-    funct.assem_instrs.push_back("pushq %rbp");
-    funct.assem_instrs.push_back("movq %rsp,%rbp");
-    funct.no_more = true;
+    funct.funct_list.push_back(funct.funct_name);
+    funct.no_more = true; //not calling any more functions
+    cout<<cntr<<"\n";   //debug
     cntr++; //go to the next line in the file
     line = v_code[cntr];
-    if( line.find('}') >= line.length())
+    cout<<line<<cntr<<"\n";  //debug
+    while(line.find('}') > line.length()-1) //until the end of the function declaration
     {
+	   cout<<"line leng  "<<line.length()<<" line find"<<line.find('}')<<"\n"; //debug
 	    coarse_parse(out_code, v_code, cntr, funct);
+	    cntr++;
+	    cout<<"cntr  "<<cntr<<"\n"; //debug
+	    line = v_code[cntr];
     } 
     
-    //still working here need to think of the best way (push all to funct.assem_instrs or to individual string vectors)    
     out_code << funct.funct_name << ":"<< "\n";
     out_code << preamble;
-    out_code << "\tfunct.var_declars here"<< "\n";
-    out_code << "\tfunct.arith_opers here"<<"\n";
+    for( auto i=funct.assem_instrs.begin() ; i != funct.assem_instrs.end(); i++){
+	    out_code << "\t" << *i <<"\n";
+    }
+    out_code << epilogue;;
     return out_code;
 }
 
 void var_dec(string line,const vector<string> &v_code,int & line_cntr,function &funct)
 {
-	funct.assem_instrs.push_back("%thing register");
+	funct.assem_instrs.push_back("declare variables here");
 	line = v_code[line_cntr];
-	line_cntr++;
+	return;
+}
 
+void funct_call(string line,const vector<string> &v_code,int & line_cntr,function &funct)
+{
+	funct.assem_instrs.push_back("calling function " + line);
+	line = v_code[line_cntr];
+	return;
 }
 
 bool is_funct_dec(const string& line)
@@ -293,7 +305,7 @@ int main(int argc, char ** argv)
     while( getline(in_code, line) ){
         string new_line = trim_tabs_spaces( line );
 	if( new_line.length() ==0) continue;  //skip blank lines
-	//cout<<new_line<<"\n";
+	//out_code <<new_line<<"\n";   //debug uncoment to write output of vector to source code (debug)
 	v_code.push_back(new_line);
     }
     in_code.close(); 
@@ -302,14 +314,13 @@ int main(int argc, char ** argv)
     function assem_instrs;
     while( line_cntr < v_code.size() ) //getline(in_code, line)) //iterate over every line in input file 
     {  
-	//out_code<< v_code[line_cntr] <<"\n";
+	//out_code<< v_code[line_cntr] <<"\n";  //debug
         //line = v_code[line_cntr];       
-        coarse_parse(out_code, v_code, line_cntr, assem_instrs);
+        cout<<"calling coarse_parse\n";
+	coarse_parse(out_code, v_code, line_cntr, assem_instrs);
+	line_cntr++;
     }
    
-    //write the post script 
-    //out_code << "\tpopq\t%rbp\n\tret\n"; // handle in fuct handler
-
     //out_code.close(); 
     
     return 0;
