@@ -18,19 +18,27 @@ struct function{
 	vector<int> mem_counter; //keep track of input arguments
 	string ret_type;
 	vector<string> assem_instrs;
+	vector<string> arith_opers;
+	vector<string> var_declars;
 	bool no_more; // is this a leaf function
-	bool ret;  //is there a return object
+	bool is_ret;  //is there a return object
 
 };
 string trim_tabs_spaces( string  in_str );
 ostream& coarse_parse(ostream &out_code, const vector<string> &v_code, int &line_cntr,function &assem_instrs );
 ostream& funct_dec(ostream &out_code,const vector<string> &v_code, int &cntr, function &funct); 
 bool is_funct_dec(const string& line);
+void var_dec(string line,const vector<string> &v_code,int & line_cntr,function &funct);
 
 
-/* not working
-void arith_state(string& line){
-
+void arith_state(string line,const vector<string> &v_code,int & line_cntr,function &funct)
+{
+	//function 
+	line = v_code[line_cntr];
+	funct.assem_instrs.push_back("assem instrs\n");  //add instructions like this
+        line_cntr++;   //dont forget to cout up the line counter before returning
+	
+	/*
 	int equalFind = line.find("="); //finds equal sign
 	int incrementFind = line.find("++"); //finds addition
 	int decrementFind = line.find("--"); //finds decrement
@@ -125,11 +133,8 @@ void arith_state(string& line){
 			
 	}
 		
-		
+	*/		
 }
-*/
-
-
 
 
 string trim_tabs_spaces( string  in_str ){
@@ -153,8 +158,8 @@ ostream& coarse_parse(ostream &out_code, const vector<string> &v_code, int &line
 	{
 	    //found variable declaration
 	    //
-	    out_code<<line.find("int")<<" var dec\n";
-	    //varable_dec(line);
+	    //out_code<<line.find("int")<<" var dec\n";
+	    var_dec(line,v_code,line_cntr,assem_instrs);
 	    line_cntr++;
 	}
 	else if( line.find("if")<line.length())
@@ -185,16 +190,17 @@ ostream& coarse_parse(ostream &out_code, const vector<string> &v_code, int &line
 	{
 	    //found function declaration
 	    //
-	    out_code<< "found a funct dec\n";
+	    //out_code<< "found a funct dec\n";
 	    funct_dec(out_code, v_code, line_cntr, assem_instrs);
 	    line_cntr++;
 	}
 	else{
 	    //arithmetic instructions
 	    //
-	    out_code<<"arithmetic instr\n";
-	    line_cntr++;
-	    //arith_state( line );
+	    //out_code<<"arithmetic instr\n";
+	    //line_cntr++;
+	    
+            arith_state( line,v_code,line_cntr, assem_instrs);
         }
         
 
@@ -207,11 +213,15 @@ ostream& coarse_parse(ostream &out_code, const vector<string> &v_code, int &line
 ostream& funct_dec(ostream &out_code,const vector<string> &v_code, int &cntr, function &funct) //function declaration statement 
 {
     
-    string preamble = "main:\n\tpushq\t%rbp\n\tmoveq\t%rsp, %rbp\n";
+    string preamble = "\tpushq\t%rbp\n\tmoveq\t%rsp, %rbp\n";
     //function funct;
     int start, end;
     string line = v_code[cntr];
     funct.ret_type = line.substr(0,line.find(' '));
+    if(funct.ret_type == "void"){ // so we know if we need to deal with return variables
+	    funct.is_ret = true;
+    }else funct.is_ret = false;
+
     string temp = line.substr(line.find(' ')+1, line.length());
     funct.funct_name = temp.substr(0, temp.find('('));
     funct.assem_instrs.push_back(funct.funct_name + ":");
@@ -222,11 +232,23 @@ ostream& funct_dec(ostream &out_code,const vector<string> &v_code, int &cntr, fu
     line = v_code[cntr];
     if( line.find('}') >= line.length())
     {
-	    cout<<line<<"\n";
 	    coarse_parse(out_code, v_code, cntr, funct);
     } 
-        
+    
+    //still working here need to think of the best way (push all to funct.assem_instrs or to individual string vectors)    
+    out_code << funct.funct_name << ":"<< "\n";
+    out_code << preamble;
+    out_code << "\tfunct.var_declars here"<< "\n";
+    out_code << "\tfunct.arith_opers here"<<"\n";
     return out_code;
+}
+
+void var_dec(string line,const vector<string> &v_code,int & line_cntr,function &funct)
+{
+	funct.assem_instrs.push_back("%thing register");
+	line = v_code[line_cntr];
+	line_cntr++;
+
 }
 
 bool is_funct_dec(const string& line)
