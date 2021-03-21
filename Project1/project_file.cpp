@@ -12,9 +12,19 @@
 //#include "project_file.h"
 
 using namespace std; 
+struct function{
+	//default function 
+	string funct_name;
+	vector<int> mem_counter; //keep track of input arguments
+	string ret_type;
+	vector<string> assem_instrs;
+	bool no_more; // is this a leaf function
+	bool ret;  //is there a return object
+
+};
 string trim_tabs_spaces( string  in_str );
-ostream& coarse_parse(ostream &out_code, const vector<string> &v_code, int &line_cntr);
-ostream& funct_dec(ostream &out_code,const vector<string> &v_code, int &cntr); 
+ostream& coarse_parse(ostream &out_code, const vector<string> &v_code, int &line_cntr,function &assem_instrs );
+ostream& funct_dec(ostream &out_code,const vector<string> &v_code, int &cntr, function &funct); 
 bool is_funct_dec(const string& line);
 
 
@@ -120,13 +130,7 @@ void arith_state(string& line){
 */
 
 
-struct function{
-	//default function 
-	string funct_name;
-	string ret_type;
-	vector<string> assem_instrs;
-	bool no_more;
-};
+
 
 string trim_tabs_spaces( string  in_str ){
 	
@@ -140,7 +144,7 @@ string trim_tabs_spaces( string  in_str ){
 	return temp.substr(i,temp.length());
 }
 
-ostream& coarse_parse(ostream &out_code, const vector<string> &v_code, int &line_cntr)
+ostream& coarse_parse(ostream &out_code, const vector<string> &v_code, int &line_cntr, function &assem_instrs )
 {	
 	cout<<line_cntr;
 	string line = v_code[ line_cntr ];
@@ -182,7 +186,7 @@ ostream& coarse_parse(ostream &out_code, const vector<string> &v_code, int &line
 	    //found function declaration
 	    //
 	    out_code<< "found a funct dec\n";
-	    funct_dec(out_code, v_code, line_cntr);
+	    funct_dec(out_code, v_code, line_cntr, assem_instrs);
 	    line_cntr++;
 	}
 	else{
@@ -200,9 +204,11 @@ ostream& coarse_parse(ostream &out_code, const vector<string> &v_code, int &line
 	return out_code;
 } 
 
-ostream& funct_dec(ostream &out_code,const vector<string> &v_code, int &cntr) //function declaration statement 
+ostream& funct_dec(ostream &out_code,const vector<string> &v_code, int &cntr, function &funct) //function declaration statement 
 {
-    function funct;
+    
+    string preamble = "main:\n\tpushq\t%rbp\n\tmoveq\t%rsp, %rbp\n";
+    //function funct;
     int start, end;
     string line = v_code[cntr];
     funct.ret_type = line.substr(0,line.find(' '));
@@ -217,7 +223,7 @@ ostream& funct_dec(ostream &out_code,const vector<string> &v_code, int &cntr) //
     if( line.find('}') >= line.length())
     {
 	    cout<<line<<"\n";
-	    coarse_parse(out_code, v_code, cntr);
+	    coarse_parse(out_code, v_code, cntr, funct);
     } 
         
     return out_code;
@@ -253,7 +259,6 @@ int main(int argc, char ** argv)
          cout<<"incorrect number of input arguments, 2 required: input and output files\n";
 	 return 1;
     }
-    string preamble = "main:\n\tpushq\t%rbp\n\tmoveq\t%rsp, %rbp\n";
    
     ifstream in_code(argv[1], ifstream::in ); //open the file to read from 
     ofstream out_code(argv[2], ifstream::out ); //open the assembly code file to write into 
@@ -261,8 +266,6 @@ int main(int argc, char ** argv)
    
     //write the preamble 
     //out_code << preamble; // maybe should be part of funct handler
-    //istream_iterator<string> fin(in_code);
-    istream_iterator<string> eof;
     vector<string> v_code; 
     //put input into a vector of strings 
     while( getline(in_code, line) ){
@@ -273,13 +276,13 @@ int main(int argc, char ** argv)
     }
     in_code.close(); 
     //cout<<"v_code_size "<<v_code.size();
-    //vector<string>::iterator itt = v_line.begin();
     int line_cntr = 0;
+    function assem_instrs;
     while( line_cntr < v_code.size() ) //getline(in_code, line)) //iterate over every line in input file 
     {  
 	//out_code<< v_code[line_cntr] <<"\n";
         //line = v_code[line_cntr];       
-        coarse_parse(out_code, v_code, line_cntr);
+        coarse_parse(out_code, v_code, line_cntr, assem_instrs);
     }
    
     //write the post script 
