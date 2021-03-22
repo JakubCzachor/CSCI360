@@ -94,3 +94,17 @@ for(int i=0;i<line.size();i++){
   
   
 }
+    
+    //Array Parsing//
+/*
+
+Check if any arrays in entire line:
+T-> check each variable for [] -> allocate size if initialied for variable that is []
+F -> Skip
+
+Check if variable
+T->if _right = any previous declared variables -> check map for previous variables and the correct parameter
+F-> _right is an integer -> if integer then variable value is "$"+_right
+
+*/
+
