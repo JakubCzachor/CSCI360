@@ -58,7 +58,7 @@ void arith_state(string line,const vector<string> &v_code,int & line_cntr,functi
 		var0ArrayFindLeft = var0.find("["); //finds left bracket
 		var0ArrayFindRight = var0.find("]"); //finds right bracket 
 			
-		if((arrayFindLeft == -1)) && (arrayFindRight == -1)){ //not an array
+		if((var0ArrayFindLeft == -1)) && (var0ArrayFindRight == -1)){ //not an array
 			
 			if(multFind != -1 || divFind != -1){ //multiplication or division is present
 				
