@@ -38,7 +38,7 @@ void arith_state(string line,const vector<string> &v_code,int & line_cntr,functi
 	line = v_code[line_cntr];
 	funct.assem_instrs.push_back("doing arritmetic\n");  //add instructions like this
         return;	
-	/*
+	
 	int equalFind = line.find("="); //finds equal sign
 	int incrementFind = line.find("++"); //finds addition
 	int decrementFind = line.find("--"); //finds decrement
@@ -63,44 +63,47 @@ void arith_state(string line,const vector<string> &v_code,int & line_cntr,functi
 			if(multFind != -1 || divFind != -1){ //multiplication or division is present
 				
 				if((multFind == -1) && divFind != -1){//division is present
-					string var1 = line.subtr(equalFind+1,divFind-1); //finds b in a=b/c;
-					string var2 = line.subtr(divFind+1, lineEnd-1); //finds c in a=b/c;
+					string var1 = line.substr(equalFind+1,divFind-1); //finds b in a=b/c;
+					string var2 = line.substr(divFind+1, lineEnd-1); //finds c in a=b/c;
 			
 					//division of variables
 				}
 				else if((multFind != -1) && (divFind == -1)){ //multiplication is present
-					string var1 = line.subtr(equalFind+1, multFind -1); //finds b in a=b*c
-					string var2 = line.subtr(multFind+1, lineEnd -1); //finds c in a=b*c
+					string var1 = line.substr(equalFind+1, multFind -1); //finds b in a=b*c
+					string var2 = line.substr(multFind+1, lineEnd -1); //finds c in a=b*c
 						
 					//multiplication of variables
 				}
         
 			}
-			else if((subFind != -1) || (addFind != -1)){ //addition or subtraction is present
+			else if((subFind != -1) || (addFind != -1)){ //addition or 
+				
+				
+				action is present
 				
         			if((subFind == -1) && (addFind != -1)){ //addition is present
-					string var1 = line.subtr(equalFind+1, addFind -1); //finds b in a=b+c
-					string var2 = line.subtr(addFind+1, lineEnd -1); //finds c in a=b+c
+					string var1 = line.substr(equalFind+1, addFind -1); //finds b in a=b+c
+					string var2 = line.substr(addFind+1, lineEnd -1); //finds c in a=b+c
 						
 					//push addl
 				}
 				else if((addFind == -1)&& (subFind != -1)){ //subtraction is present
-					string var1 = line.subtr(equalFind+1, subFind -1); //finds b in a=b-c
-					string var2 = line.subtr(subFind+1, lineEnd -1); //finds c in a=b-c
+					string var1 = line.substr(equalFind+1, subFind -1); //finds b in a=b-c
+					string var2 = line.substr(subFind+1, lineEnd -1); //finds c in a=b-c
 						
 					//push subl
 				}
 					
 			}
 			else{//Neither is present, other state -> x=y
-				string var2 = line.subtr(equalFind, line.length()); 
+				string var2 = line.substr(equalFind, line.length()); 
 				int var2ArrayFindLeft = var2.find("[");
 				int var2ArrayFindRight = var2.find("]");
 				if((var2ArrayFindLeft == -1) && (var2ArrayFindRight == -1)){ //not an array
 					//set two variables equal to each other
 				}
 				else{ //y is a variable
-					string var2Array = var2.subtr(var2ArrayFindLeft+1, var2ArrayFindRight-1); //var2Array => z in x = y[z]
+					string var2Array = var2.substr(var2ArrayFindLeft+1, var2ArrayFindRight-1); //var2Array => z in x = y[z]
 					//set variable equal to number in an array
 				}
 			}
@@ -121,11 +124,11 @@ void arith_state(string line,const vector<string> &v_code,int & line_cntr,functi
 			
 	//}
 	else if((equalFind == -1) && (incrementFind != -1)){ //Increments Variable
-		var0 = line.subtr(0, incrementFind);
+		var0 = line.substr(0, incrementFind);
 			
 	}
 	else if((equalFind == -1) && (decrementFind != -1)){ //Decrements Variable
-			var0 = line.subtr(0, decrementFind); 
+			var0 = line.substr(0, decrementFind); 
 			
 	}
 	else{ //not "=", "==", "++", or "--"
@@ -133,7 +136,7 @@ void arith_state(string line,const vector<string> &v_code,int & line_cntr,functi
 			
 	}
 		
-	*/		
+			
 }
 
 
