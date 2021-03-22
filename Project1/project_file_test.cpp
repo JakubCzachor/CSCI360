@@ -1,5 +1,8 @@
 /* Part of variable parsing */
-
+#include <iostream>
+#include <vector>
+#include <string>
+using namespace std;
 //variable declaration, sorting by commas //
 //Since we can specify the rules, no more than X declarations in a given line//
 //Here is 5//
