@@ -37,7 +37,7 @@ if(commaFind1 != -1){
     }
   }
 } //other variable initializiation
-cout << "Number of variables declared: << num_declared << endl;
+cout << "Number of variables declared:" << num_declared << endl;
   
 string var0_left; 
 string var0_right;
