@@ -54,21 +54,7 @@ void arith_state(string line,const vector<string> &v_code,int & line_cntr,functi
 	int var0ArrayFindRight;
 
 	string var0; //original variable;
-<<<<<<< HEAD
 
-	if((incrementFind == -1) && (decrementFind == -1)){ //checks to see != "==" && != "++" or "--" (== is comparitor)
-
-		var0 = line.substr(0,equalFind); //first variable
-		var0ArrayFindLeft = var0.find("["); //finds left bracket
-		var0ArrayFindRight = var0.find("]"); //finds right bracket
-
-		if((var0ArrayFindLeft == -1) && (var0ArrayFindRight == -1)){ //not an array
-
-			if(multFind != -1 || divFind != -1){ //multiplication or division is present
-
-				if((multFind == -1) && divFind != -1){//division is present
-=======
-		
 	if((incrementFind == string::npos) && (decrementFind == string::npos)){ //checks to see != "==" && != "++" or "--" (== is comparitor)
 		
 		var0 = line.substr(0,equalFind); //first variable
@@ -80,7 +66,7 @@ void arith_state(string line,const vector<string> &v_code,int & line_cntr,functi
 			if(multFind != string::npos || divFind != string::npos){ //multiplication or division is present
 				
 				if((multFind == string::npos) && divFind != string::npos){//division is present
->>>>>>> aee02f4d54e9693e5e4371faad2db644212b56d2
+
 					string var1 = line.substr(equalFind+1,divFind-1); //finds b in a=b/c;
 					string var2 = line.substr(divFind+1, lineEnd-1); //finds c in a=b/c;
 
@@ -94,15 +80,10 @@ void arith_state(string line,const vector<string> &v_code,int & line_cntr,functi
 				}
 
 			}
-<<<<<<< HEAD
-			else if((subFind != -1) || (addFind != -1)){ //addition or subtraction is present
 
-        			if((subFind == -1) && (addFind != -1)){ //addition is present
-=======
 			else if((subFind != string::npos) || (addFind != string::npos)){ //addition or subtraction is present
 				
         			if((subFind == string::npos) && (addFind != string::npos)){ //addition is present
->>>>>>> aee02f4d54e9693e5e4371faad2db644212b56d2
 					string var1 = line.substr(equalFind+1, addFind -1); //finds b in a=b+c
 					string var2 = line.substr(addFind+1, lineEnd -1); //finds c in a=b+c
 
@@ -148,15 +129,10 @@ void arith_state(string line,const vector<string> &v_code,int & line_cntr,functi
 		var0 = line.substr(0, incrementFind);
 
 	}
-<<<<<<< HEAD
-	else if((equalFind == -1) && (decrementFind != -1)){ //Decrements Variable
-			var0 = line.substr(0, decrementFind);
 
-=======
 	else if((equalFind string::npos) && (decrementFind != string::npos)){ //Decrements Variable
 			var0 = line.substr(0, decrementFind); 
-			
->>>>>>> aee02f4d54e9693e5e4371faad2db644212b56d2
+
 	}
 	else{ //not "=", "==", "++", or "--"
 
