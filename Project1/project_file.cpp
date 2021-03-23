@@ -17,7 +17,7 @@ struct function{
 	vector<string> funct_list; //keeper of all past function names
 	string funct_name; //keeper of the current function name
 	vector<int> mem_counter; //keep track of input arguments
-	map<string, vector<string>> var_dec;
+	map<string, vector<int>> var_dec;
 	string var_reg[6] = {"%edi","%esi","%edx","%ecx","%r8d","%r9d"};
 	int input_leng;
 	string ret_type;
@@ -253,52 +253,16 @@ void var_dec(string line,const vector<string> &v_code,int & line_cntr,function &
 {
     line = line.substr(line.find(' ')+1, line.length()-1); //remove the "int" and ";"
 
-    int countComma = 0;
-    for(int i=0; i<line.length();i++){
-      if(line[i] == ','){
-        countComma++;
-      }
-    }
-    cout << "line: "<<line<<endl;
-    cout << "countComma count: " << countComma << endl;
-    //Needs some testing, but much cleaner solution
-
-    vector<int> commaFindv;
-    vector<int> equalFindv;
-    vector<bool> isArrayLeft;
-    vector<bool> isArrayRight;
-    vector<bool> isIntChar;
-    vector<int> charValue;
-    vector<int> arrayValueLeft;
-    vector<int> arrayValueRight;
-
-
-    int arrayVal;
-    int arrayLBracket;
-    int arrayRBracket;
-    int intTemp;
-    int lineEnd = line.find(";");
-    string arrayString;
-    string charString;
-    vector<string> varVecRight;
-    vector<string> varVecLeft;
-
-    size_t currentComma = line.find(",");
-    size_t currentEqual = line.find("=");
-    size_t open_brack = line.find("=[");
-
     char j;
     string var = "";
-    int value
+    int value;
     list vars; // list of the variable names
     list vector<int> values;  // list of the values
-    for(int i=0 ; i<line.length() ; i++  ){
+    for(int i=0; i<line.length(); i++ ){
         if( isalpha( line[i] ) ){
             var.append( line[i] );
         }
         else if( line[i] == "="){
-           vars.push_back(var);
-           var = "";
            i++;
            if( isdigit( line[i] )){
               value = line[i];
@@ -309,7 +273,7 @@ void var_dec(string line,const vector<string> &v_code,int & line_cntr,function &
               }
 
            }
-           if( line[i] = [ ] )
+           else if( line[i] = '[]' )
         }
 
 
