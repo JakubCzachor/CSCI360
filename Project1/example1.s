@@ -1,6 +1,7 @@
 func:
 	pushq	%rbp
 	moveq	%rsp, %rbp
+	declare variables here
 	doing arritmetic
 
 	popq	%rbp
@@ -8,8 +9,10 @@ func:
 main:
 	pushq	%rbp
 	moveq	%rsp, %rbp
+	declare variables here
 	doing arritmetic
 
+	declare variables here
 	declare variables here
 	calling function func();
 	doing arritmetic

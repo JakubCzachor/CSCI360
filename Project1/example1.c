@@ -1,9 +1,11 @@
 void func(){
-    1+1=2;
+   int a,b=2;
+   a = b+3;
 }
 
 int main(){
 	int a,b,c,d;
+	int arr[10];
 	func();
 }
 

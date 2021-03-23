@@ -9,7 +9,7 @@
 #include <vector>
 #include <list> 
 #include <iterator>
-//#include "project_file.h"
+#include <map>
 
 using namespace std; 
 struct function{
@@ -17,6 +17,7 @@ struct function{
 	vector<string> funct_list; //keeper of all past function names
 	string funct_name; //keeper of the current function name
 	vector<int> mem_counter; //keep track of input arguments
+	map<string,string> var_dec;
 	string ret_type;
 	vector<string> assem_instrs;
 	vector<string> arith_opers;
@@ -151,15 +152,14 @@ string trim_tabs_spaces( string  in_str ){
 
 ostream& coarse_parse(ostream &out_code, const vector<string> &v_code, int &line_cntr, function &assem_instrs )
 {	
-	cout<<"course parse cntr"<< line_cntr<<"\n"; //debug
+	//cout<<"course parse cntr"<< line_cntr<<"\n"; //debug
 	string line = v_code[ line_cntr ];
-        cout<<"course parse line "<<line<<"\n"; //debug
+        //cout<<"course parse line "<<line<<"\n"; //debug
 
 	//seach for a function call (loops through all the functions added to the list)
 	for(auto i = assem_instrs.funct_list.begin(); i != assem_instrs.funct_list.end(); i++){
 		if( line.find(*i)==0 && line.find("(") < line.length()){
 		    //found a function call
-		    cout<<"stuck here?"<<"\n";//debug
 		    funct_call(line,v_code,line_cntr,assem_instrs);
 		}
 		
@@ -167,16 +167,14 @@ ostream& coarse_parse(ostream &out_code, const vector<string> &v_code, int &line
         //search for variable declarations
 	if( line.find("int") ==0 && line.find(";")<line.length())
 	{
-	    cout<<line.find("int")<<" var dec\n";  //debug
+	    //cout<<line.find("int")<<" var dec\n";  //debug
 	    var_dec(line,v_code,line_cntr,assem_instrs);
 	}
+	//found an if statement
 	else if( line.find("if")<line.length())
 	{
-	    //found an if statement
-	    //
-	    out_code<< line.find("if")<<"\n";
+	    //out_code<< line.find("if")<<"\n";
 	    out_code<<"if_state\n";
-	    //if_state(line);
 	}
 	else if( line.find("for")<line.length())
 	{
@@ -194,16 +192,13 @@ ostream& coarse_parse(ostream &out_code, const vector<string> &v_code, int &line
 	//found function declaration
 	else if( is_funct_dec( line ) == true )
 	{
-	    cout<< "found a funct dec\n";  //debug
+	    //cout<< "found a funct dec\n";  //debug
 	    funct_dec(out_code, v_code, line_cntr, assem_instrs);
 	    
 	}
 	else{
 	    //arithmetic instructions
-	    //
-	    cout<<"arithmetic instr\n";
-	    //line_cntr++;
-	     
+	    //cout<<"arithmetic instr\n";
             arith_state( line,v_code,line_cntr, assem_instrs);
         }
         
@@ -227,16 +222,16 @@ ostream& funct_dec(ostream &out_code,const vector<string> &v_code, int &cntr, fu
     funct.funct_name = temp.substr(0, temp.find('('));
     funct.funct_list.push_back(funct.funct_name);
     funct.no_more = true; //not calling any more functions
-    cout<<cntr<<"\n";   //debug
+    //cout<<cntr<<"\n";   //debug
     cntr++; //go to the next line in the file
     line = v_code[cntr];
-    cout<<line<<cntr<<"\n";  //debug
+    //cout<<line<<cntr<<"\n";  //debug
     while(line.find('}') > line.length()-1) //until the end of the function declaration
     {
-	   cout<<"line leng  "<<line.length()<<" line find"<<line.find('}')<<"\n"; //debug
+	   //cout<<"line leng  "<<line.length()<<" line find"<<line.find('}')<<"\n"; //debug
 	    coarse_parse(out_code, v_code, cntr, funct);
 	    cntr++;
-	    cout<<"cntr  "<<cntr<<"\n"; //debug
+	    //cout<<"cntr  "<<cntr<<"\n"; //debug
 	    line = v_code[cntr];
     } 
     
@@ -251,8 +246,28 @@ ostream& funct_dec(ostream &out_code,const vector<string> &v_code, int &cntr, fu
 
 void var_dec(string line,const vector<string> &v_code,int & line_cntr,function &funct)
 {
+        string var_type = line.substr(0,line.find(' '));
+	if( var_type.find("int") == 0 ) //only need to deal with integers so this better be true
+	{
+	   	int offset = 4;
+	} 
+	string vars = line.substr(line.find(' '),line.find(';')-1);
+	//count the number of variables to declare
+	size_t end_var=0, start_var = 0;
+	string var;
+	while(end_var != string::npos){
+	    end_var = vars.find(',',start_var,1);  //find only the next occurance
+	    if(end_var == string::npos){ // case of declaring only one variable
+		var = vars.substr(start_var,vars.length()-1) ;
+	    }
+	    else{
+		    var = vars.substr(start_var,end_var);
+		    start_var = end_var;
+	    }
+	    //push the variable to stack 
+	    cout<<"found "<<vars;
+	}
 	funct.assem_instrs.push_back("declare variables here");
-	line = v_code[line_cntr];
 	return;
 }
 
@@ -316,7 +331,7 @@ int main(int argc, char ** argv)
     {  
 	//out_code<< v_code[line_cntr] <<"\n";  //debug
         //line = v_code[line_cntr];       
-        cout<<"calling coarse_parse\n";
+        //cout<<"calling coarse_parse\n";
 	coarse_parse(out_code, v_code, line_cntr, assem_instrs);
 	line_cntr++;
     }
