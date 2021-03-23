@@ -19,13 +19,18 @@ vector<int> commaFindv;
 vector<int> equalFindv;
 vector<bool> isArrayLeft;
 vector<bool> isArrayRight;
+vector<bool> isIntChar;
+vector<int> charValue;
 vector<int> arrayValueLeft;
 vector<int> arrayValueRight;
+
 
 int arrayVal;
 int arrayLBracket;
 int arrayRBracket;
+int intTemp;
 string arrayString;
+string charString;
 vector<string> varVecRight;
 vector<string> varVecLeft;
 
@@ -45,38 +50,52 @@ if(commaFindv.size()<countComma){
   nextEqual = line.find("=", currentEqual);
   commaFindv.push_back(nextComma);
   
-  if(line.substr(currentComma+1, nextEqual-1).find("[")!= -1){
+  if(line.substr(currentComma+1, nextEqual-1).find("[")!= -1){ //if there is an array on the left side
     
-    isArrayLeft.push_back(TRUE); //pushes true state to isArray
+    isArrayLeft.push_back(true); //pushes true state to isArray
     
     arrayString = line.substr(currentComma+1, nextEqual-1); //creates a new string between , and =
     arrayLBracket = arrayString.find("["); //finds [
     arrayRBracket = arrayString.find("]"); //finds ]
     arrayString = arrayString.substr(arrayLBracket+1, arrayRBracket-1); //creates a new string between [ and ]
-  
+    
     arrayVal = stoi(arrayString); //converts the data inside [ and ] into an int
     
     arrayValueLeft.push_back(arrayVal);
     
   }
-  else{
-    isArrayLeft.push_back(FALSE);
+  else{ //if there is no array on the left
+    isArrayLeft.push_back(false); //pushes false state
   }
-  if(line.substr(nextEqual+1, nextComma-1).find("[") != -1){
+  if(line.substr(nextEqual+1, nextComma-1).find("[") != -1){ //if there is an array on the right side
     
-    isArrayRight.push_back(TRUE);
+    isArrayRight.push_back(true); //pushes true state to isArrayRight
     arrayString = line.substr(nextEqual+1, nextComma-1); //creates a new string between = and ,
     arrayLBracket = arrayString.find("["); //finds [
     arrayRBracket = arrayString.find("]"); //finds ]
     arrayString = arrayString.substr(arrayLBracket+1, arrayRBracket-1); //creates a new string between [ and ]
-  
+    
     arrayVal = stoi(arrayString); //converts the data inside [ and ] into an int
     
-    arrayValueRight.push_back(arrayVal);
+    arrayValueRight.push_back(arrayVal); //pushes array value to right 
   }
-   else{
-    isArrayRight.push_back(FALSE);
-   }
+   else{ //if there is no array on the right
+     
+    isArrayRight.push_back(false); //pushes false state
+    charString = line.substr(nextEqual+1, nextComma-1); //temp string to check for characters
+     //searches for 1-9//
+    if(charString.find("1") || charString.find("2") || charString.find("3") || charString.find("4") || charString.find("5") || charString.find("6") || charString.find("7") || charString.find("8") || charString.find("9")!=-1){
+      
+      isIntChar.push_back(true); //pushes true to isIntChar vector
+      intTemp = stoi(charString); //converts to integer
+      charValue.push_back(intTemp); //pushes integer onto charValue vector
+
+    }
+     else{
+       isIntChar.push_back(false); //pushes false to isIntChar vector since no integer found
+     }
+   }//end else
+     
   varVecLeft.push_back(line.substr(currentComma+1, nextEqual-1));
   varVecRight.push_back(line.substr(nextEqual+1, nextComma-1));
 
@@ -84,8 +103,8 @@ if(commaFindv.size()<countComma){
   currentComma = nextComma; //updates comma
   currentEqual = nextEqual; //updates equal
   
-  }
-}
+  }//end if
+}//end for loop
 /*
 int commaFind0 = line.find(",");
 int equalFind0 = line.find("=");
