@@ -14,15 +14,24 @@ for(int i=0; i<line.length();i++){
   }
 }
 //Needs some testing, but much cleaner solution
+
 vector<int> commaFindv;
 vector<int> equalFindv;
 vector<bool> isArrayLeft;
 vector<bool> isArrayRight;
+vector<int> arrayValueLeft;
+vector<int> arrayValueRight;
 
+int arrayVal;
+int arrayLBracket;
+int arrayRBracket;
+string arrayString;
 vector<string> varVecRight;
 vector<string> varVecLeft;
+
 size_t currentComma = line.find(",");
 int currentEqual = line.find("=");
+
 size_t nextComma;
 int nextEqual;
 
@@ -37,13 +46,33 @@ if(commaFindv.size()<countComma){
   commaFindv.push_back(nextComma);
   
   if(line.substr(currentComma+1, nextEqual-1).find("[")!= -1){
-    isArrayLeft.push_back(TRUE);
+    
+    isArrayLeft.push_back(TRUE); //pushes true state to isArray
+    
+    arrayString = line.substr(currentComma+1, nextEqual-1); //creates a new string between , and =
+    arrayLBracket = arrayString.find("["); //finds [
+    arrayRBracket = arrayString.find("]"); //finds ]
+    arrayString = arrayString.substr(arrayLBracket+1, arrayRBracket-1); //creates a new string between [ and ]
+  
+    arrayVal = stoi(arrayString); //converts the data inside [ and ] into an int
+    
+    arrayValueLeft.push_back(arrayVal);
+    
   }
   else{
     isArrayLeft.push_back(FALSE);
   }
   if(line.substr(nextEqual+1, nextComma-1).find("[") != -1){
+    
     isArrayRight.push_back(TRUE);
+    arrayString = line.substr(nextEqual+1, nextComma-1); //creates a new string between = and ,
+    arrayLBracket = arrayString.find("["); //finds [
+    arrayRBracket = arrayString.find("]"); //finds ]
+    arrayString = arrayString.substr(arrayLBracket+1, arrayRBracket-1); //creates a new string between [ and ]
+  
+    arrayVal = stoi(arrayString); //converts the data inside [ and ] into an int
+    
+    arrayValueRight.push_back(arrayVal);
   }
    else{
     isArrayRight.push_back(FALSE);
