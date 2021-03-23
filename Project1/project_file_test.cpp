@@ -6,6 +6,9 @@ using namespace std;
 //variable declaration, sorting by commas //
 //left side of equation is stored in varVecLeft, right side is stored in varVecRight. That way, we know varVecLeft[0] = varVecRight[0]
 // isArrayLeft[i] matches up with varVecLeft, isArrayRight[i] matches up with varVecRight
+// isIntChar checks the right side of equation for each declaration, matches up with isArrayRight[i] and varVecRight[i]
+// If isArrayLeft is true, then the value is stored in order on arrayValueLeft, same with isArrayRight, and isIntChar -> arrayValueRight, charValue.
+
 
 int countComma = 0;
 for(int i=0; i<line.length();i++){
