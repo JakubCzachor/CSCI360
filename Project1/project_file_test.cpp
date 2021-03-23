@@ -5,6 +5,8 @@
 using namespace std;
 //variable declaration, sorting by commas //
 //left side of equation is stored in varVecLeft, right side is stored in varVecRight. That way, we know varVecLeft[0] = varVecRight[0]
+// isArrayLeft[i] matches up with varVecLeft, isArrayRight[i] matches up with varVecRight
+
 int countComma = 0;
 for(int i=0; i<line.length();i++){
   if(line[i] == ','){
@@ -14,6 +16,9 @@ for(int i=0; i<line.length();i++){
 //Needs some testing, but much cleaner solution
 vector<int> commaFindv;
 vector<int> equalFindv;
+vector<bool> isArrayLeft;
+vector<bool> isArrayRight;
+
 vector<string> varVecRight;
 vector<string> varVecLeft;
 size_t currentComma = line.find(",");
@@ -24,14 +29,28 @@ int nextEqual;
 commaFindv.push_back(line.find(",")); //first comma
 equalFindv.push_back(line.find("=")); //first equal sign.
 
-for(int i = 0;i<countComma;i++){
+for(int i = 0;i<countComma;i++){ 
 if(commaFindv.size()<countComma){
   
   nextComma = line.find(",", currentComma);
   nextEqual = line.find("=", currentEqual);
-  commaFindv.push_back(nextComma)
+  commaFindv.push_back(nextComma);
+  
+  if(line.substr(currentComma+1, nextEqual-1).find("[")!= -1){
+    isArrayLeft.push_back(TRUE);
+  }
+  else{
+    isArrayLeft.push_back(FALSE);
+  }
+  if(line.substr(nextEqual+1, nextComma-1).find("[") != -1){
+    isArrayRight.push_back(TRUE);
+  }
+   else{
+    isArrayRight.push_back(FALSE);
+   }
   varVecLeft.push_back(line.substr(currentComma+1, nextEqual-1));
   varVecRight.push_back(line.substr(nextEqual+1, nextComma-1));
+
   
   currentComma = nextComma; //updates comma
   currentEqual = nextEqual; //updates equal
