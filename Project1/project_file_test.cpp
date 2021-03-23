@@ -4,7 +4,7 @@
 #include <string>
 using namespace std;
 //variable declaration, sorting by commas //
-//left side of equation is stored in varVecLeft, right side is stored in varVecRight. That way, we know varVecLeft[0] = varVecRight[1]
+//left side of equation is stored in varVecLeft, right side is stored in varVecRight. That way, we know varVecLeft[0] = varVecRight[0]
 int countComma = 0;
 for(int i=0; i<line.length();i++){
   if(line[i] == ','){
