@@ -248,108 +248,230 @@ ostream& funct_dec(ostream &out_code,const vector<string> &v_code, int &cntr, fu
 
 void var_dec(string line,const vector<string> &v_code,int & line_cntr,function &funct)
 {
+    line = line.substr(line.find(' ')+1, line.length()-1); //remove the "int" and ";"
 
-	//Needs some testing, but much cleaner solution
+    int countComma = 0;
+    for(int i=0; i<line.length();i++){
+      if(line[i] == ','){
+        countComma++;
+      }
+    }
+    cout << "line: "<<line<<endl;
+    cout << "countComma count: " << countComma << endl;
+    //Needs some testing, but much cleaner solution
 
-	vector<int> commaFindv;
-	vector<int> equalFindv;
-	vector<bool> isArrayLeft;
-	vector<bool> isArrayRight;
-	vector<bool> isIntChar;
-	vector<int> charValue;
-	vector<int> arrayValueLeft;
-	vector<int> arrayValueRight;
-
-
-	int arrayVal;
-	int arrayLBracket;
-	int arrayRBracket;
-	int intTemp;
-	string arrayString;
-	string charString;
-	vector<string> varVecRight;
-	vector<string> varVecLeft;
-    line = line.substr(line.find(' ')+1, line.length());
-	int countComma = 0;
-	for(int i=0; i<line.length();i++){
-	    if(line[i] == ','){
-		    countComma++;
-	  }
-	}
-	size_t currentComma = line.find(",");
-	int currentEqual = line.find("=");
-
-	size_t nextComma;
-	int nextEqual;
-
-	commaFindv.push_back(line.find(",")); //first comma
-	equalFindv.push_back(line.find("=")); //first equal sign.
-
-	for(int i = 0;i<countComma;i++){
-		if(commaFindv.size()<countComma){
-
-		  nextComma = line.find(",", currentComma);
-		  nextEqual = line.find("=", currentEqual);
-		  commaFindv.push_back(nextComma);
-		  cout<<"nextComma "<<nextComma<<" nextEqual "<<nextEqual<< "\n";
-		  if(line.substr(currentComma+1, nextEqual-1).find("[")!= -1){ //if there is an array on the left side
-
-				isArrayLeft.push_back(true); //pushes true state to isArray
-
-				arrayString = line.substr(currentComma+1, nextEqual-1); //creates a new string between , and =
-				arrayLBracket = arrayString.find("["); //finds [
-				arrayRBracket = arrayString.find("]"); //finds ]
-				arrayString = arrayString.substr(arrayLBracket+1, arrayRBracket-1); //creates a new string between [ and ]
-
-				arrayVal = stoi(arrayString); //converts the data inside [ and ] into an int
-
-				arrayValueLeft.push_back(arrayVal);
-
-		  }
-		  else{ //if there is no array on the left
-				isArrayLeft.push_back(false); //pushes false state
-		  }
-		  if(line.substr(nextEqual+1, nextComma-1).find("[") != -1){ //if there is an array on the right side
-
-				isArrayRight.push_back(true); //pushes true state to isArrayRight
-				arrayString = line.substr(nextEqual+1, nextComma-1); //creates a new string between = and ,
-				arrayLBracket = arrayString.find("["); //finds [
-				arrayRBracket = arrayString.find("]"); //finds ]
-				arrayString = arrayString.substr(arrayLBracket+1, arrayRBracket-1); //creates a new string between [ and ]
-
-				arrayVal = stoi(arrayString); //converts the data inside [ and ] into an int
-
-				arrayValueRight.push_back(arrayVal); //pushes array value to right
-			  }
-			   else{ //if there is no array on the right
-
-				isArrayRight.push_back(false); //pushes false state
-				charString = line.substr(nextEqual+1, nextComma-1); //temp string to check for characters
-				 //searches for 1-9//
-				if(charString.find("1") || charString.find("2") || charString.find("3") || charString.find("4") || charString.find("5") || charString.find("6") || charString.find("7") || charString.find("8") || charString.find("9")!=-1){
-
-				  isIntChar.push_back(true); //pushes true to isIntChar vector
-				  intTemp = stoi(charString); //converts to integer
-				  charValue.push_back(intTemp); //pushes integer onto charValue vector
-
-				}
-				 else{
-				   isIntChar.push_back(false); //pushes false to isIntChar vector since no integer found
-				 }
-			   }//end else
-
-			  varVecLeft.push_back(line.substr(currentComma+1, nextEqual-1));
-			  varVecRight.push_back(line.substr(nextEqual+1, nextComma-1));
+    vector<int> commaFindv;
+    vector<int> equalFindv;
+    vector<bool> isArrayLeft;
+    vector<bool> isArrayRight;
+    vector<bool> isIntChar;
+    vector<int> charValue;
+    vector<int> arrayValueLeft;
+    vector<int> arrayValueRight;
 
 
-			  currentComma = nextComma; //updates comma
-			  currentEqual = nextEqual; //updates equal
+    int arrayVal;
+    int arrayLBracket;
+    int arrayRBracket;
+    int intTemp;
+    int lineEnd = line.find(";");
+    string arrayString;
+    string charString;
+    vector<string> varVecRight;
+    vector<string> varVecLeft;
 
-		  }//end if
-	}//end for loop
+    size_t currentComma = line.find(",");
+    size_t currentEqual = line.find("=");
+    size_t open_brack = line.find("=[");
 
-	funct.assem_instrs.push_back("declare variables here");
-	return;
+    char j;
+    string var = "";
+    int value
+    list vars; // list of the variable names
+    list vector<int> values;  // list of the values
+    for(int i=0 ; i<line.length() ; i++  ){
+        if( isalpha( line[i] ) ){
+            var.append( line[i] );
+        }
+        else if( line[i] == "="){
+           vars.push_back(var);
+           var = "";
+           i++;
+           if( isdigit( line[i] )){
+              value = line[i];
+              i++;
+              while( isdigit( line[i] )){
+                  value = 10*value + line[i];
+                  i++;
+              }
+
+           }
+           if( line[i] = [ ] )
+        }
+
+
+
+
+    }
+
+
+
+    cout << "currentComma: " << currentComma <<endl << "currentEqual: " << currentEqual <<endl;
+    size_t nextComma;
+    int nextEqual;
+    size_t prevComma;
+
+    //varVecRight.push_back(currentEqual, )
+
+    for(int i = 0;i<countComma;i++){
+
+
+      if(line.find(",",currentComma+1) != string::npos){
+       nextComma = line.find(",", currentComma+1);
+       commaFindv.push_back(nextComma);
+      }
+      else{
+        cout << "no next comma";
+        nextComma = lineEnd;
+        cout << nextComma << "next comma" << endl;
+      }
+
+      nextEqual = line.find("=", currentComma);
+
+      if(varVecLeft.empty()){ //at start
+        if(line.substr(0, currentComma-1).find("[")!= string::npos){ //if there is an array on the left side
+        cout <<"detected";
+        isArrayLeft.push_back(true); //pushes true state to isArray
+
+        arrayString = line.substr(0, currentComma); //creates a new string between 0 and ,
+        arrayLBracket = arrayString.find("["); //finds [
+        arrayRBracket = arrayString.find("]"); //finds ]
+        arrayString = arrayString.substr(arrayLBracket+1, arrayRBracket-1); //creates a new string between [ and ]
+
+        arrayVal = stoi(arrayString); //converts the data inside [ and ] into an int
+
+        arrayValueLeft.push_back(arrayVal);
+
+      }
+      else{ //if there is no array on the left
+        isArrayLeft.push_back(false); //pushes false state
+        cout << "Not detected" <<endl;
+      }
+      if(line.substr(currentEqual+1, currentComma-1).find("[") != string::npos){ //if there is an array on the right side
+
+        isArrayRight.push_back(true); //pushes true state to isArrayRight
+        arrayString = line.substr(currentEqual+1, currentComma-1); //creates a new string between = and ,
+        arrayLBracket = arrayString.find("["); //finds [
+        arrayRBracket = arrayString.find("]"); //finds ]
+        arrayString = arrayString.substr(arrayLBracket+1, arrayRBracket-1); //creates a new string between [ and ]
+
+        arrayVal = stoi(arrayString); //converts the data inside [ and ] into an int
+
+        arrayValueRight.push_back(arrayVal); //pushes array value to right
+      }
+       else{ //if there is no array on the right
+
+        isArrayRight.push_back(false); //pushes false state
+        charString = line.substr(currentEqual+1, currentComma-2); //temp string to check for characters
+        cout << charString << "THIS IS CHAR STRING" <<endl;
+         //searches for 1-9//
+        if((charString.find("1") || charString.find("2") || charString.find("3") || charString.find("4") || charString.find("5") || charString.find("6") || charString.find("7") || charString.find("8") || charString.find("9")) != string::npos){
+          cout << charString << "charString Detected" << endl;
+          isIntChar.push_back(true); //pushes true to isIntChar vector
+          //intTemp = stoi(charString); //converts to integer
+          //charValue.push_back(intTemp); //pushes integer onto charValue vector
+
+        }
+         else{
+           isIntChar.push_back(false); //pushes false to isIntChar vector since no integer found
+         }
+       }//end else
+      }
+      else{
+
+
+      if(line.substr(prevComma+1, currentEqual-1).find("[")!= string::npos){ //if there is an array on the left side
+        cout <<"detected";
+        isArrayLeft.push_back(true); //pushes true state to isArray
+
+        arrayString = line.substr(prevComma+1, nextEqual-1); //creates a new string between start and =
+        arrayLBracket = arrayString.find("["); //finds [
+        arrayRBracket = arrayString.find("]"); //finds ]
+        arrayString = arrayString.substr(arrayLBracket+1, arrayRBracket-1); //creates a new string between [ and ]
+
+        arrayVal = stoi(arrayString); //converts the data inside [ and ] into an int
+
+        arrayValueLeft.push_back(arrayVal);
+
+      }
+      else{ //if there is no array on the left
+        isArrayLeft.push_back(false); //pushes false state
+        cout << "Not detected" <<endl;
+      }
+      if(line.substr(currentEqual+1, currentComma-1).find("[") != string::npos){ //if there is an array on the right side
+
+        isArrayRight.push_back(true); //pushes true state to isArrayRight
+        arrayString = line.substr(currentEqual+1, currentComma-1); //creates a new string between = and ,
+        arrayLBracket = arrayString.find("["); //finds [
+        arrayRBracket = arrayString.find("]"); //finds ]
+        arrayString = arrayString.substr(arrayLBracket+1, arrayRBracket-1); //creates a new string between [ and ]
+
+        arrayVal = stoi(arrayString); //converts the data inside [ and ] into an int
+
+        arrayValueRight.push_back(arrayVal); //pushes array value to right
+      }
+       else{ //if there is no array on the right
+
+        isArrayRight.push_back(false); //pushes false state
+        charString = line.substr(currentEqual+1, currentComma-2); //temp string to check for characters
+        cout << charString << "THIS IS CHAR STRING" <<endl;
+         //searches for 1-9//
+        if((charString.find("1") || charString.find("2") || charString.find("3") || charString.find("4") || charString.find("5") || charString.find("6") || charString.find("7") || charString.find("8") || charString.find("9")) != string::npos){
+          cout << charString << "charString Detected" << endl;
+          isIntChar.push_back(true); //pushes true to isIntChar vector
+          //intTemp = stoi(charString); //converts to integer
+          //charValue.push_back(intTemp); //pushes integer onto charValue vector
+
+        }
+         else{
+           isIntChar.push_back(false); //pushes false to isIntChar vector since no integer found
+         }
+       }//end else
+      }
+      if(varVecLeft.empty()){
+        cout << currentEqual <<endl;
+        varVecLeft.push_back(line.substr(0, currentEqual-1));
+        varVecRight.push_back(line.substr(currentEqual+1, currentComma-2));
+
+      }
+      else{
+      varVecLeft.push_back(line.substr(prevComma, currentEqual-1));
+      varVecRight.push_back(line.substr(currentEqual+1, nextComma-1));
+      }
+      prevComma = currentComma;
+      currentComma = nextComma; //updates comma
+      currentEqual = nextEqual; //updates equal
+
+
+    }//end for loop
+    cout << "vecleft" <<endl;
+    if(varVecLeft.size()==0){
+      cout << "left empty";
+    }
+    else{
+      cout << "left size: " << varVecLeft.size();
+    }
+    if(varVecRight.size()==0){
+      cout <<"right empty";
+    }
+    for(int i = 0;i<varVecLeft.size();i++){
+      cout << varVecLeft[i] << endl;
+    }
+    cout << "vecright" << endl;
+    for(int i = 0; i<varVecRight.size();i++){
+      cout << varVecRight[i] <<endl;
+    }
+
 }
 
 void funct_call(string line,const vector<string> &v_code,int & line_cntr,function &funct)
