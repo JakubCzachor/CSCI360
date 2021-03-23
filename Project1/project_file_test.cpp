@@ -4,8 +4,41 @@
 #include <string>
 using namespace std;
 //variable declaration, sorting by commas //
-//Since we can specify the rules, no more than X declarations in a given line//
-//Here is 5//
+//left side of equation is stored in varVecLeft, right side is stored in varVecRight. That way, we know varVecLeft[0] = varVecRight[1]
+int countComma = 0;
+for(int i=0; i<line.length();i++){
+  if(line[i] == ','){
+    countComma++;
+  }
+}
+//Needs some testing, but much cleaner solution
+vector<int> commaFindv;
+vector<int> equalFindv;
+vector<string> varVecRight;
+vector<string> varVecLeft;
+size_t currentComma = line.find(",");
+int currentEqual = line.find("=");
+size_t nextComma;
+int nextEqual;
+
+commaFindv.push_back(line.find(",")); //first comma
+equalFindv.push_back(line.find("=")); //first equal sign.
+
+for(int i = 0;i<countComma;i++){
+if(commaFindv.size()<countComma){
+  
+  nextComma = line.find(",", currentComma);
+  nextEqual = line.find("=", currentEqual);
+  commaFindv.push_back(nextComma)
+  varVecLeft.push_back(line.substr(currentComma+1, nextEqual-1));
+  varVecRight.push_back(line.substr(nextEqual+1, nextComma-1));
+  
+  currentComma = nextComma; //updates comma
+  currentEqual = nextEqual; //updates equal
+  
+  }
+}
+/*
 int commaFind0 = line.find(",");
 int equalFind0 = line.find("=");
 int num_declared = 0;
@@ -17,6 +50,7 @@ if(commaFind0 != -1){
 else{
   cout<<"no multiple variable declarations here";
 }
+
 
 int commaFind1 = line.find(",",commaFind0_st); //checks if more than 2 variables declared
 if(commaFind1 != -1){
@@ -53,6 +87,7 @@ string var3_right;
 string var4_left;
 string var4_right;
 
+       
 int lineEnd = line.find(";");
 for(int i=0;i<line.size();i++){
   if(equalFind0 != -1 && commaFind0 != -1){ //if equal is present, and comma is also present, meaning x=x,b=c;
@@ -93,11 +128,15 @@ for(int i=0;i<line.size();i++){
        
       
   }
-   
-  
   
 }
-    
+  
+*/
+//Recursively//
+/*
+for(int i<
+
+*/
     //Array Parsing//
 /*
 
