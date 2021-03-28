@@ -6,10 +6,13 @@ class funct:
         pass
     funct_list = []
     funct_name = ""
+
     variables = {}
+
     var_registers = ["movl  ${},  %edi","movl   ${},  %esi","movl   ${},  %edx","movl   ${},  %ecx","movl    ${},  %r8d","movl    ${},  r9d","pushq    ${}","pushq ${}","pushq  ${}"]
     assem_instrs = []
     arith_opers = ""
+    mem_offset = -12
     ret_type = ""   #return type
     red_zone = False
     is_ret = False
@@ -39,7 +42,7 @@ def funct_dec(out_code, v_code, line_cntr, func):
         func.is_ret = False
 
     temp = line.split(" ")[1]
-    print(temp)
+    #print(temp)
     func.funct_name = temp.split("(")[0]
     func.funct_list.append(func.funct_name)
     #funct.is_leaf = True; #not calling any more functions
@@ -48,20 +51,39 @@ def funct_dec(out_code, v_code, line_cntr, func):
     #print("funct ",funct)
     while '}' not in line: #until the end of the function declaration
 	    #cout<<"line leng  "<<line.length()<<" line find"<<line.find('}')<<"\n"; //debug
-	    coarse_parse(out_code, v_code, line_cntr, functs=func);
+	    coarse_parse(out_code, v_code, line_cntr, func);
 	    line_cntr+=1
 	    #cout<<"cntr  "<<cntr<<"\n"; //debug
 	    line = v_code[line_cntr]
-
     out_code.write(func.funct_name + ":\n")
     out_code.write(preamble)
     for i in func.assem_instrs:
 	    out_code.write("\t" + i + "\n")
+    out_arr = []
 
+    if not func.is_leaf or func.mem_offset > 128:     #red zone thing
+        out_code.write("\t"+"subq    $" ,func.mem_offset,+",  %rsp")
+    for var in func.variables:
+        #print(var," ",func.variables[var])
+
+        arr_mem_offset = []
+        if not func.variables[var]["vals"]:
+            mem = func.mem_offset
+            arr_mem_offset.append( func.mem_offset )
+            func.mem_offset += 4
+        for val in func.variables[var]["vals"]:
+            arr_mem_offset.append( func.mem_offset )
+            func.mem_offset += 4
+            out_arr.insert(0,"\tmovel   ${},  {}(%rbp)\n".format(val,func.mem_offset))
+        func.variables[var]["mem_loc"] = arr_mem_offset
+        #print("mem offset ", func.variables[var],"\n")
+
+    for line in out_arr:
+        out_code.write(line)
     out_code.write( epilogue )
-
+    func.variables.clear()
     #pop all variables from dictionary before returning
-
+    func.mem_offset = -12
     return out_code
 
 def arith_state(out_code, v_code, line_cntr, functs):
@@ -78,8 +100,10 @@ def var_dec(out_code, v_code, line_cntr, functs):
            undeclared ints a
            declared ints  a = 14
            declared int array a[3] = {1,2,3}"""
+    print("variable declaration")
     line = v_code[line_cntr].rstrip(';\n')
     temp = line.split("int ")[1] #will always be int for our purposes
+
     #print("vars ", line)
     temp = temp.split(",")
     if '\n' in temp:
@@ -88,32 +112,40 @@ def var_dec(out_code, v_code, line_cntr, functs):
         temp.pop(';')
     #print("temp ",temp) #debug
     i = 0
-    while i < len(temp):
-        if '={' in temp[i]:  #found a declared array
 
+    while i < len(temp):
+        vals = []
+        var = ""
+        var_def = {}
+        if '={' in temp[i]:  #found a declared array
             var =  temp[i].split('[')[0]
-            val = temp[i].split('={')[1]
-            functs.variables[var] = [int(val)]
+            vals.append( temp[i].split('={')[1] )
+
+            #var_def[var] = val
+            #functs.variables["vars"]["vars"] = [(int(val) )]
             i+=1
+            functs.mem_offset+=4
+
             while '}' not in temp[i]:
-                functs.variables[var].append( int(temp[i]) )
+                vals.append( int(temp[i]) )
+                functs.mem_offset -= 4
                 i+=1
             last_val = int(temp[i].split('}')[0])
-            functs.variables[var].append(last_val)
-            var = ""
+            vals.append(last_val)
 
         elif '=' in temp[i]: #found a declared int
             #print("found declared int")  #debug
             var, val = temp[i].split('=')
-            functs.variables[var] = [int(val)]
-
+            vals= [ (int(val)) ]
+            functs.mem_offset -= 4
         else: #found an undeclared int
             var = temp[i]
-            functs.variables[var] = []
+            vars = []
+            functs.mem_offset -= 4
+        #add to a new dict
+        var_def['vals'] = vals
+        funct.variables[var] = var_def
         i+=1
-    print(functs.variables) #debug
-    #now add them to the registers
-
 
 def funct_call(out_code, v_code, line_cntr, functs):
     line = v_code[line_cntr]
@@ -135,7 +167,7 @@ def return_state(out_code, v_code, line_cntr, functs):
 
 def coarse_parse(out_code, v_code, line_cntr, functs):
     line = v_code[line_cntr]
-    print(functs)
+    #print(functs)
     # seach for a function call (loops through all the functions added to the list)
     if functs != None and functs.funct_list:
         for i in functs.funct_list :
