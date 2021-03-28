@@ -265,12 +265,12 @@ void var_dec(string line,const vector<string> &v_code,int & line_cntr,function &
             while(isalpha( line[i] ) )
             {   
                 cout<<line[i];
-                var= var+line[i] ;
+                var.append(line[i],1) ;
                 i++;
                 cout<<i;
             }
         }
-        cout<<"var "<<var<<" "<<line[i];
+        //cout<<"var "<<var<<" "<<line[i];
         while( line[i] == ' '){ i++; }//skip spaces
         if( line[i] == '[')
         {

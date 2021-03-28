@@ -24,7 +24,7 @@ bool isDigitCheck(string s){ //checks if digit
 }
 
 int main(){ //replace with something else
-string line  = "323[3]={1,2,3},100=njjj,zaza[4949]={1},1232=321;" ;  //remove this once incorporating
+string line  = "aaa[3]={1,2,3},b=5,zaza[1]={1},c,d=321;" ;  //remove this once incorporating
 size_t countComma = 0;
 for(int i=0; i<line.length();i++){//loops through text
   if(line[i] == ','){ //checks for ','
@@ -79,7 +79,7 @@ for(int i = 0;i<countComma+1;i++){
   varVecLeft.push_back(line.substr(prevComma, tempVal)); //pushes left side to left vector
   isArrayLeft.push_back(isArrayCheck(line.substr(prevComma, tempVal))); //checks if variable is a vector
   isIntCharLeft.push_back(isDigitCheck(line.substr(prevComma, tempVal))); //checks if variable is aninteger
-   
+
     arrayString = line.substr(arrayLBracket+1, tempValArray-1); //converts the numbers in the array brackets into a seperate string
     arrayValueLeft.push_back(stol(arrayString)); //pushes the string to vector after converting to an integer
 
