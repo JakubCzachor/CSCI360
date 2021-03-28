@@ -359,5 +359,6 @@ cout <<"array declared value: "<<endl;
 for(int i=0; i<arrayDeclareValue.size();i++){
   cout <<"variable: "<< i<< " " << arrayDeclareValue[i] <<endl;
 }
+  return 0;
 }
 
