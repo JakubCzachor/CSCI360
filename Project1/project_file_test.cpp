@@ -10,7 +10,149 @@ using namespace std;
 // If isArrayLeft is true, then the value is stored in order on arrayValueLeft, same with isArrayRight, and isIntChar -> arrayValueRight, charValue.
 
 int main(){
+    
+    void arith_state(string line,const vector<string> &v_code,int & line_cntr,function &funct)
+{
+	//function
+	line = v_code[line_cntr];
+	funct.assem_instrs.push_back("doing arritmetic\n");  //add instructions like this
+        return;
 
+	size_t equalFind = line.find("="); //finds equal sign
+	size_t incrementFind = line.find("++"); //finds addition
+	size_t decrementFind = line.find("--"); //finds decrement
+	size_t multFind = line.find("*"); //finds *
+	size_t divFind = line.find("/"); //finds /
+	size_t addFind = line.find("+"); //finds +
+	size_t subFind = line.find("-"); //finds -
+	size_t lineEnd = line.find(";"); //finds end
+  size_t compareFind = line.find("==");
+  size_t tempVar;
+
+	string var0; //original variable;
+			
+		//PSEUDOCODE:
+    if(varVecArrayLeft[i] != -1  varVecRight[i] != -1){ //if both are arrays
+      if(multFind != string::npos){ //if multiplication is found
+
+      }
+      else if(divFind != string::npos){ //if division is found
+
+      }
+
+      else if(addFind != string::npos){//if addition is found
+
+      }
+      else if(subFind != string::npos){ //if subtraction is found
+
+      }
+      else if(incrementFind != string::npos){//if increment is found
+
+      }
+      else if(decrementFind != string::npos){//if decrement is found
+
+      }
+      else if(compareFind != string::npos){
+
+      }
+      else{//x[y]=y[x] direcly
+
+      }
+
+
+    }
+    else if(varVecLeft[i] != -1 && varVecRight[i] == -1){//left side is an array
+      if(multFind != string::npos){ //if multiplication is found
+
+      }
+      else if(divFind != string::npos){ //if division is found
+
+      }
+
+      else if(addFind != string::npos){//if addition is found
+
+      }
+      else if(subFind != string::npos){ //if subtraction is found
+
+      }
+      else if(incrementFind != string::npos){//if increment is found
+
+      }
+      else if(decrementFind != string::npos){//if decrement is found
+
+      }
+      else if(compareFind != string::npos){
+
+      }
+      else{//not one of these states - error states
+
+      }// x[y]= y
+
+
+    } 
+
+    else if(varVecRight[i] == -1 && varVecRight[i] != -1){//right side is an array
+      if(multFind != string::npos){ //if multiplication is found
+
+      }
+      else if(divFind != string::npos){ //if division is found
+
+      }
+
+      else if(addFind != string::npos){//if addition is found
+
+      }
+      else if(subFind != string::npos){ //if subtraction is found
+
+      }
+      else if(incrementFind != string::npos){//if increment is found
+
+      }
+      else if(decrementFind != string::npos){//if decrement is found
+
+      }
+      else if(compareFind != string::npos){
+
+      }
+      else{//x=y[x]
+
+      }
+
+    }
+    else{ //neither are arrays
+    if( isIntCharRight[i] != -1){ //if right side is an integer
+      if(multFind != string::npos){ //if multiplication is found
+
+      }
+      else if(divFind != string::npos){ //if division is found
+
+      }
+
+      else if(addFind != string::npos){//if addition is found
+
+      }
+      else if(subFind != string::npos){ //if subtraction is found
+
+      }
+      else if(incrementFind != string::npos){//if increment is found
+
+      }
+      else if(decrementFind != string::npos){//if decrement is found
+
+      }
+      else if(compareFind != string::npos){
+
+      }
+      else{ //x =3
+
+      }
+
+
+    }
+    }//end else if
+
+    } 
+/*
     string line  = "a=2,b=3,c=[1,2,3],d;" ;
     int countComma = 0;
     for(int i=0; i<line.length();i++){
@@ -199,7 +341,7 @@ int main(){
       cout << varVecRight[i] <<endl;
     }
 
-}
+}*/
 /*
 int commaFind0 = line.find(",");
 int equalFind0 = line.find("=");
