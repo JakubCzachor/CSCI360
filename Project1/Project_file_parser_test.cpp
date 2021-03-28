@@ -25,7 +25,7 @@ bool isDigitCheck(string s){ //checks if digit
 
 int main(){ //replace with something else
 string line  = "323[3]={1,2,3},100=njjj,zaza[4949]={1},1232=321;" ;  //remove this once incorporating
-int countComma = 0;
+size_t countComma = 0;
 for(int i=0; i<line.length();i++){//loops through text
   if(line[i] == ','){ //checks for ','
     countComma++; //counts the number of commas
@@ -41,25 +41,22 @@ vector<bool> isIntCharLeft; //1 if left side is int, 0 if not
 vector<bool> isIntCharRight; //1 if right side is int, 0 if not
 vector<bool> isArrayBeingDeclared; //1 if right side is an array getting declared, 0 if not
 
-vector<long> charValueLeft; //if not a char, the value will be -1
-vector<long> charValueRight; //if not a char, the value will be -1
-vector<long> arrayValueLeft; //if not an array, the value will be -1
+vector<long long> charValueLeft; //if not a char, the value will be -1
+vector<long long> charValueRight; //if not a char, the value will be -1
+vector<long long> arrayValueLeft; //if not an array, the value will be -1
 vector<long> arrayValueRight; //if not an array, the value will be -1
 vector<long> arrayDeclareValue;  //
 vector<long> arrayDeclaredSize; //gets size of each array, pushes it onto the array
-int arrayTempVal;
-int arrayVal;
-int countCommaArray;
-int currentCommaArray;
-int nextCommaArray;
-int prevCommaArray;
-int arrayLSqBracket;
-int arrayRSqBracket;
-int arrayLBracket; //used to get pos of left side bracket
-int arrayRBracket; //used to get pos of the right side bracket
-int intTemp;
+size_t arrayTempVal;
+size_t currentCommaArray;
+size_t nextCommaArray;
+size_t prevCommaArray;
+size_t arrayLSqBracket;
+size_t arrayRSqBracket;
+size_t arrayLBracket; //used to get pos of left side bracket
+size_t arrayRBracket; //used to get pos of the right side bracket
 
-int lineEnd = line.find(";"); //finds the end of line
+size_t lineEnd = line.find(";"); //finds the end of line
 string arrayString;
 string charString;
 vector<string> varVecRight; //vector of right variables
@@ -82,7 +79,7 @@ for(int i = 0;i<countComma+1;i++){
   varVecLeft.push_back(line.substr(prevComma, tempVal)); //pushes left side to left vector
   isArrayLeft.push_back(isArrayCheck(line.substr(prevComma, tempVal))); //checks if variable is a vector
   isIntCharLeft.push_back(isDigitCheck(line.substr(prevComma, tempVal))); //checks if variable is aninteger
-    tempValArray = arrayRBracket - arrayLBracket; //finds the distance between the two values
+   
     arrayString = line.substr(arrayLBracket+1, tempValArray-1); //converts the numbers in the array brackets into a seperate string
     arrayValueLeft.push_back(stol(arrayString)); //pushes the string to vector after converting to an integer
 
@@ -92,7 +89,7 @@ for(int i = 0;i<countComma+1;i++){
   if(isArrayCheck(line.substr(prevComma, tempVal)) == true){ //if left side start is an arrray
     arrayLBracket = line.find("["); //finds the left Bracket
     arrayRBracket = line.find("]"); //finds the right bracket
-
+      tempValArray = arrayRBracket - arrayLBracket; //finds the distance between the two values
     charValueLeft.push_back(-1); //pushes -1 since if its a char, it isnt a
 
     if(isArrayCheck(line.substr(prevComma, tempVal)) == true && line.find('{',currentEqual) != string::npos){ //if finds an array initialization
@@ -102,7 +99,7 @@ for(int i = 0;i<countComma+1;i++){
       prevCommaArray = line.find("{"); //sets start comma to beginning of bracket
       currentCommaArray = line.find(",", prevCommaArray+1); //finds next comma
       nextCommaArray = line.find(",",currentCommaArray+1); //finds following comma;
-      int countCommaArray = 0; //initialize commacount specifically for array
+      size_t countCommaArray = 0; //initialize commacount specifically for array
 
 
       for(int j=0;j<arrayTempVal;j++){ //loops through the length of the array
@@ -363,3 +360,4 @@ for(int i=0; i<arrayDeclareValue.size();i++){
   cout <<"variable: "<< i<< " " << arrayDeclareValue[i] <<endl;
 }
 }
+
