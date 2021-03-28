@@ -4,13 +4,14 @@ import sys
 class funct:
     def __init__(self):
         pass
-    funct_list = ["thing"]
+    funct_list = []
     funct_name = ""
     variables = {}
-    var_registers = ["%edi","%esi","%edx","%ecx","%r8d","%r9d"]
+    var_registers = ["movl  ${},  %edi","movl   ${},  %esi","movl   ${},  %edx","movl   ${},  %ecx","movl    ${},  %r8d","movl    ${},  r9d","pushq    ${}","pushq ${}","pushq  ${}"]
     assem_instrs = []
     arith_opers = ""
     ret_type = ""   #return type
+    red_zone = False
     is_ret = False
     is_leaf = True
 
@@ -25,44 +26,52 @@ def is_funct_dec(line):
         return True
     else:
         return False
-def funct_dec(out_code, v_code, line_cntr, functs):
-    preamble = "\tpushq\t%rbp\n\tmoveq\t%rsp, %rbp\n"
+def funct_dec(out_code, v_code, line_cntr, func):
+    preamble = "\tpushq\t%rbp\n\tmovq\t%rsp, %rbp\n"
     epilogue =  "\tpopq\t%rbp\n\tret\n"
 
-    #function funct
+    #func = funct()
     line = v_code[line_cntr]
-    funct.ret_type = line.split(" ")[0]
-    if funct.ret_type == "void": # so we know if we need to deal with return variables
-	    funct.is_ret = True
+    func.ret_type = line.split(" ")[0]
+    if func.ret_type == "void": # so we know if we need to deal with return variables
+	    func.is_ret = True
     else:
-        funct.is_ret = False
+        func.is_ret = False
 
     temp = line.split(" ")[1]
     print(temp)
-    funct.funct_name = temp.split("(")[0]
-    funct.funct_list.append(funct.funct_name)
+    func.funct_name = temp.split("(")[0]
+    func.funct_list.append(func.funct_name)
     #funct.is_leaf = True; #not calling any more functions
     line_cntr+=1  #go to the next line in the file
     line = v_code[line_cntr]
+    #print("funct ",funct)
     while '}' not in line: #until the end of the function declaration
 	    #cout<<"line leng  "<<line.length()<<" line find"<<line.find('}')<<"\n"; //debug
-	    coarse_parse(out_code, v_code, line_cntr, funct);
+	    coarse_parse(out_code, v_code, line_cntr, functs=func);
 	    line_cntr+=1
 	    #cout<<"cntr  "<<cntr<<"\n"; //debug
 	    line = v_code[line_cntr]
 
-    out_code.write(funct.funct_name + ":\n")
+    out_code.write(func.funct_name + ":\n")
     out_code.write(preamble)
-    for i in funct.assem_instrs:
+    for i in func.assem_instrs:
 	    out_code.write("\t" + i + "\n")
 
     out_code.write( epilogue )
+
+    #pop all variables from dictionary before returning
+
     return out_code
 
 def arith_state(out_code, v_code, line_cntr, functs):
     line = v_code[line_cntr]
     print("arithmeticing")
+
+
+    #for demo
     functs.assem_instrs.append(" move to reg ")
+
 
 def var_dec(out_code, v_code, line_cntr, functs):
     """ types to worry about:
@@ -77,15 +86,14 @@ def var_dec(out_code, v_code, line_cntr, functs):
         temp.pop('\n')
     if ';' in temp:
         temp.pop(';')
-    print("temp ",temp)
-    var = ""
-    vals = []
+    #print("temp ",temp) #debug
     i = 0
     while i < len(temp):
         if '={' in temp[i]:  #found a declared array
+
             var =  temp[i].split('[')[0]
-            val1 = temp[i].split('={')[1]
-            functs.variables[var] = [int(val1)]
+            val = temp[i].split('={')[1]
+            functs.variables[var] = [int(val)]
             i+=1
             while '}' not in temp[i]:
                 functs.variables[var].append( int(temp[i]) )
@@ -95,7 +103,7 @@ def var_dec(out_code, v_code, line_cntr, functs):
             var = ""
 
         elif '=' in temp[i]: #found a declared int
-            print("found declared int")
+            #print("found declared int")  #debug
             var, val = temp[i].split('=')
             functs.variables[var] = [int(val)]
 
@@ -103,12 +111,13 @@ def var_dec(out_code, v_code, line_cntr, functs):
             var = temp[i]
             functs.variables[var] = []
         i+=1
-    print(functs.variables)
-
+    print(functs.variables) #debug
+    #now add them to the registers
 
 
 def funct_call(out_code, v_code, line_cntr, functs):
     line = v_code[line_cntr]
+    functs.is_leaf = False
     print("function call ",line)
 
 def if_state(out_code, v_code, line_cntr, functs):
@@ -126,9 +135,9 @@ def return_state(out_code, v_code, line_cntr, functs):
 
 def coarse_parse(out_code, v_code, line_cntr, functs):
     line = v_code[line_cntr]
-    #print(line)
+    print(functs)
     # seach for a function call (loops through all the functions added to the list)
-    if functs.funct_list:
+    if functs != None and functs.funct_list:
         for i in functs.funct_list :
             if i in line:
                 #print("found a function call")
@@ -159,7 +168,7 @@ def coarse_parse(out_code, v_code, line_cntr, functs):
     #look for function declarations
     elif is_funct_dec(line) == True:
         #print("found a funct dec\n") # debug
-        funct_dec(out_code, v_code, line_cntr, functs);
+        funct_dec(out_code, v_code, line_cntr,functs);
 
     # found arithmetic instructions
     else:
