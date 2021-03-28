@@ -41,12 +41,12 @@ vector<bool> isIntCharLeft; //1 if left side is int, 0 if not
 vector<bool> isIntCharRight; //1 if right side is int, 0 if not
 vector<bool> isArrayBeingDeclared; //1 if right side is an array getting declared, 0 if not
 
-vector<int> charValueLeft; //if not a char, the value will be -1
-vector<int> charValueRight; //if not a char, the value will be -1
-vector<int> arrayValueLeft; //if not an array, the value will be -1
-vector<int> arrayValueRight; //if not an array, the value will be -1
-vector<int> arrayDeclareValue;  //
-vector<int> arrayDeclaredSize; //gets size of each array, pushes it onto the array
+vector<long> charValueLeft; //if not a char, the value will be -1
+vector<long> charValueRight; //if not a char, the value will be -1
+vector<long> arrayValueLeft; //if not an array, the value will be -1
+vector<long> arrayValueRight; //if not an array, the value will be -1
+vector<long> arrayDeclareValue;  //
+vector<long> arrayDeclaredSize; //gets size of each array, pushes it onto the array
 int arrayTempVal;
 int arrayVal;
 int countCommaArray;
@@ -84,7 +84,7 @@ for(int i = 0;i<countComma+1;i++){
   isIntCharLeft.push_back(isDigitCheck(line.substr(prevComma, tempVal))); //checks if variable is aninteger
     tempValArray = arrayRBracket - arrayLBracket; //finds the distance between the two values
     arrayString = line.substr(arrayLBracket+1, tempValArray-1); //converts the numbers in the array brackets into a seperate string
-    arrayValueLeft.push_back(stoi(arrayString)); //pushes the string to vector after converting to an integer
+    arrayValueLeft.push_back(stol(arrayString)); //pushes the string to vector after converting to an integer
 
 
 
@@ -119,7 +119,7 @@ for(int i = 0;i<countComma+1;i++){
 
       for(int j=0;j<=countCommaArray;j++){
             arrayTempVal = currentCommaArray-prevCommaArray; //distance between previous comma and next comma
-            arrayDeclareValue.push_back(stoi(line.substr(prevCommaArray+1,arrayTempVal-1))); //pushes what is inbetween the { and,
+            arrayDeclareValue.push_back(stol(line.substr(prevCommaArray+1,arrayTempVal-1))); //pushes what is inbetween the { and,
 
             prevCommaArray = currentCommaArray; //updates value of previous comma to current comma
 
@@ -150,7 +150,7 @@ for(int i = 0;i<countComma+1;i++){
     isArrayBeingDeclared.push_back(0); //pushes false since no array is being declared
 
     if(isDigitCheck(line.substr(prevComma, tempVal)) == true){ //checks to see if its an integer
-    charValueLeft.push_back(stoi(line.substr(prevComma,tempVal))); //converts it into an int, pushes it onto charValueLeft.
+    charValueLeft.push_back(stol(line.substr(prevComma,tempVal))); //converts it into an int, pushes it onto charValueLeft.
     }//end if
     else{
       charValueLeft.push_back(-1); //pushes -1 to value instead.
@@ -169,7 +169,7 @@ for(int i = 0;i<countComma+1;i++){
     arrayRBracket = line.find("]",currentEqual+1); //finds the right bracket
     tempValArray = arrayRBracket - arrayLBracket; //finds the distance between the two values
     arrayString = line.substr(arrayLBracket+1, tempValArray-1); //converts the numbers in the array brackets into a seperate string
-    arrayValueRight.push_back(stoi(arrayString)); //pushes the string to vector after converting to an integer
+    arrayValueRight.push_back(stol(arrayString)); //pushes the string to vector after converting to an integer
     charValueRight.push_back(-1); //since its an array, it cannot be an integer.
 
    }//end if
@@ -178,7 +178,7 @@ for(int i = 0;i<countComma+1;i++){
     arrayValueRight.push_back(-1); //pushes -1 if it is not an array
 
     if(isDigitCheck(line.substr(currentEqual+1, tempVal-1)) == 1){ //checks to see if its an integer
-    charValueRight.push_back(stoi(line.substr(currentEqual+1,tempVal-1))); //converts it into an int, pushes it onto charValueLeft.
+    charValueRight.push_back(stol(line.substr(currentEqual+1,tempVal-1))); //converts it into an int, pushes it onto charValueLeft.
     }//end if
 
     else{//if not an integer
@@ -204,7 +204,7 @@ for(int i = 0;i<countComma+1;i++){
     arrayRBracket = line.find("]",prevComma+1); //finds the right bracket
     tempValArray = arrayRBracket - arrayLBracket; //finds the distance between the two values
     arrayString = line.substr(arrayLBracket+1, tempValArray-1); //converts the numbers in the array brackets into a seperate string
-    arrayValueLeft.push_back(stoi(arrayString)); //pushes the string to vector after converting to an integer
+    arrayValueLeft.push_back(stol(arrayString)); //pushes the string to vector after converting to an integer
     charValueLeft.push_back(-1); //not an integer if an array
 
     if(isArrayCheck(line.substr(prevComma+1, tempVal)) == true && line.find('{',prevComma+1)!= string::npos){ //if finds an array initialization on right side
@@ -231,7 +231,7 @@ for(int i = 0;i<countComma+1;i++){
 
       for(int j=0;j<countCommaArray;j++){
             arrayTempVal = currentCommaArray-prevCommaArray; //distance between previous comma and next comma
-            arrayDeclareValue.push_back(stoi(line.substr(prevCommaArray+1,arrayTempVal-1))); //pushes what is inbetween the { and,
+            arrayDeclareValue.push_back(stol(line.substr(prevCommaArray+1,arrayTempVal-1))); //pushes what is inbetween the { and,
 
             prevCommaArray = currentCommaArray; //updates value of previous comma to current comma
 
@@ -259,7 +259,7 @@ for(int i = 0;i<countComma+1;i++){
     arrayValueLeft.push_back(-1); //pushes -1 if it is not an array
     isArrayBeingDeclared.push_back(0); //array is not being declared on the right side
     if(isDigitCheck(line.substr(prevComma+1, tempVal-1)) == 1){ //checks to see if its an integer
-    charValueLeft.push_back(stoi(line.substr(prevComma+1,tempVal-1))); //converts it into an int, pushes it onto charValueLeft.
+    charValueLeft.push_back(stol(line.substr(prevComma+1,tempVal-1))); //converts it into an int, pushes it onto charValueLeft.
     }//end if
     else{//if not an integer
       charValueLeft.push_back(-1); //pushes -1 to value instead.
@@ -280,7 +280,7 @@ for(int i = 0;i<countComma+1;i++){
     arrayRBracket = line.find("]",currentEqual); //finds the right bracket
     tempValArray = arrayRBracket - arrayLBracket; //finds the distance between the two values
     arrayString = line.substr(arrayLBracket+1, tempValArray-1); //converts the numbers in the array brackets into a seperate string
-    arrayValueRight.push_back(stoi(arrayString)); //pushes the string to vector after converting to an integer
+    arrayValueRight.push_back(stol(arrayString)); //pushes the string to vector after converting to an integer
     charValueRight.push_back(-1); //since its an array, cant be an integer
 
 
@@ -290,7 +290,7 @@ for(int i = 0;i<countComma+1;i++){
     arrayValueRight.push_back(-1); //pushes -1 if it is not an array
 
     if(isDigitCheck(line.substr(currentEqual+1, tempVal-1)) == 1){ //checks to see if its an integer
-    charValueRight.push_back(stoi(line.substr(currentEqual+1,tempVal-1))); //converts it into an int, pushes it onto charValueLeft.
+    charValueRight.push_back(stol(line.substr(currentEqual+1,tempVal-1))); //converts it into an int, pushes it onto charValueLeft.
     }//end if
     else{//if not an integer
       charValueRight.push_back(-1); //pushes -1 to value instead.
