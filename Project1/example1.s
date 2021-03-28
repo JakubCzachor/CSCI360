@@ -1,8 +1,6 @@
 func:
 	pushq	%rbp
 	moveq	%rsp, %rbp
-	doing arritmetic
-
 	popq	%rbp
 	ret
 main:
@@ -10,7 +8,6 @@ main:
 	moveq	%rsp, %rbp
 	doing arritmetic
 
-	calling function func();
 	doing arritmetic
 
 	popq	%rbp
