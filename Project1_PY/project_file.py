@@ -7,18 +7,18 @@ class funct:
 
     funct_list = []
     funct_name = ""
-
+    funct_call =[]
     variables = {}
 
     var_registers = ["movl  ${},  %edi","movl   ${},  %esi","movl   ${},  %edx","movl   ${},  %ecx","movl    ${},  %r8d","movl    ${},  r9d","pushq    ${}","pushq ${}","pushq  ${}"]
     assem_instrs = []
     arith_opers = ""
-    mem_offset = 0
+    mem_offset = -8
     ret_type = ""   #return type
     red_zone = False
     is_ret = False
     is_leaf = True
-
+    ifForCounter = 1;
 def is_funct_dec(line):
     if "int" in line and "(" in line:
         return True
@@ -74,7 +74,7 @@ def funct_dec(out_code, v_code, line_cntr, func):
         for val in func.variables[var]["vals"]:
             #arr_mem_offset.append(func.mem_offset)
             func.mem_offset += 4
-            out_arr.insert(0, "\tmovel   ${},  {}(%rbp)\n".format(val, func.variables[var]["mem_loc"][i]))  # reverse the order of which they
+            out_arr.insert(0, "\tmovl   ${},  {}(%rbp)\n".format(val, func.variables[var]["mem_loc"][i]))  # reverse the order of which they
             i+=1
     for line in out_arr:
         out_code.write(line)
@@ -82,7 +82,6 @@ def funct_dec(out_code, v_code, line_cntr, func):
         out_code.write("\t" + i + "\n")
     out_code.write( epilogue )
     func.variables.clear()
-    func.assem_instrs = []
     #pop all variables from dictionary before returning
     func.mem_offset = 0
     return out_code, line_cntr
@@ -94,54 +93,77 @@ def arith_state(out_code, v_code, line_cntr, functs):
     if (equalFind !=-1): ##checks to make sure that there is an equal sign in the equation
         #print(line_cntr, "THIS IS THE LINE WERE IN") #debug
 
-
-
-        functs.assem_instrs.append("test stuff       asdfasdfasdfsdfsfgsdf")
-
-
         if(line.find("*")!=-1):
-            print("Multiplication \n")
-            multFind = line.find("/")
+            #print("Multiplication \n")
+            multFind = line.find("*")
             tempString = line[:equalFind] #finds string to equal sign (first variable)
             tempString2 = line[equalFind+1:multFind] #finds second variable
             tempString3 = line[multFind+1:lineEnd] #finds third variable
-            mem_offset_of_tempString = 1 #placeholder funct.variables[tempString]["mem_loc"][0]
-            mem_offset_of_tempString2 = 1 #placeholder funct.variables[tempString2]["mem_loc"][0]
-            mem_offset_of_tempString3 = 1 #placeholder funct.variables[tempString3]["mem_loc"][0]
+
+            if(tempString.find("[") !=-1): #there is an array in tempString
+                tempNumArray = int(tempString[tempString.find("[")+1: tempString.find("]")])
+            else:
+                tempNumArray = 0
+            if(tempString2.find("[")!= -1):
+                tempNumArray2 = int(tempString2[tempString2.find("[")+1: tempString2.find("]")])
+            else: tempNumArray2 = 0
+            if(tempString3.find("[") != -1):
+                tempNumArray3 = int(tempString3[tempString3.find("[")+1: tempString3.find("]")])
+            else:
+                tempNumArray3 = 0
+
+            mem_offset_of_tempString = funct.variables[tempString]["mem_loc"][tempNumArray]
+            mem_offset_of_tempString2 = funct.variables[tempString2]["mem_loc"][tempNumArray2]
+            mem_offset_of_tempString3 = funct.variables[tempString3]["mem_loc"][tempNumArray3]
 
             AppendString = "movl "+str(mem_offset_of_tempString3)+"(%rbp), %eax"
-            print(AppendString)#debug
-            #functs.assem_instrs.append(AppendString)
+
+            functs.assem_instrs.append(AppendString)
             AppendString = "imull " + str(mem_offset_of_tempString2) + "(%rbp), %eax"
-            print(AppendString)#debug
-            #functs.assem_instrs.append(AppendString)
+
+            functs.assem_instrs.append(AppendString)
             AppendString = "movl %eax, "+str(mem_offset_of_tempString) +"(%rbp)"
-            print(AppendString)#debug
-            #functs.assem_instrs.append(AppendString)
+
+            functs.assem_instrs.append(AppendString)
 
             #print("String 1", tempString, " String 2", tempString2, " String 3", tempString3)
 
         elif(line.find("/")!=-1):
-            print("division detected on line", line_cntr," ", line)
+            #print("division detected on line", line_cntr," ", line)
             divFind = line.find("/")
             tempString = line[:equalFind] #finds first variable
             tempString2 = line[equalFind+1:divFind] #finds  second variable
             tempString3 = line[divFind+1:lineEnd] #finds third variable
-            mem_offset_of_tempString = 1 #placeholder funct.variables[tempString]["mem_loc"][0]
-            mem_offset_of_tempString2 = 1 #placeholder funct.variables[tempString2]["mem_loc"][0]
-            mem_offset_of_tempString3 = 1 #placeholder funct.variables[tempString3]["mem_loc"][0]
+
+            if(tempString.find("[") !=-1): #there is an array in tempString
+                tempNumArray = int(tempString[tempString.find("[")+1: tempString.find("]")])
+            else:
+                tempNumArray = 0
+            if(tempString2.find("[")!= -1):
+                tempNumArray2 = int(tempString2[tempString2.find("[")+1: tempString2.find("]")])
+            else:
+                tempNumArray2 = 0
+            if(tempString3.find("[") != -1):
+                tempNumArray3 = int(tempString3[tempString3.find("[")+1: tempString3.find("]")])
+            else:
+                tempNumArray3 = 0
+
+            mem_offset_of_tempString = funct.variables[tempString]["mem_loc"][tempNumArray]
+            mem_offset_of_tempString2 = funct.variables[tempString2]["mem_loc"][tempNumArray2]
+            mem_offset_of_tempString3 = funct.variables[tempString3]["mem_loc"][tempNumArray3]
+
             AppendString = "movl "+ str(mem_offset_of_tempString2)+"(%rbp), %eax"
-            print(AppendString)#debug
-            #functs.assem_instrs.append(AppendString)
+
+            functs.assem_instrs.append(AppendString)
             AppendString = "cltd"
-            print(AppendString)#debug
-            #functs.assem_instrs.append(AppendString)
+
+            functs.assem_instrs.append(AppendString)
             AppendString = "idivl " + str(mem_offset_of_tempString3)+"(%rbp)"
-            print(AppendString)#debug
-            #functs.assem_instrs.append(AppendString)
-            AppendString = "movl %eax "+ str(mem_offset_of_tempString) + "(%rbp)"
-            print(AppendString)#debug
-            #functs.assem_instrs.append(AppendString)
+
+            functs.assem_instrs.append(AppendString)
+            AppendString = "movl %eax, "+ str(mem_offset_of_tempString) + "(%rbp)"
+
+            functs.assem_instrs.append(AppendString)
             #print("String 1", tempString, " String 2", tempString2, " String 3", tempString3)
 
         elif(line.find("+")!=-1 and (line.find("++") ==-1)): #checks to see if addition, and not increment
@@ -149,37 +171,53 @@ def arith_state(out_code, v_code, line_cntr, functs):
             tempString = line[:equalFind] #first variable
             tempString2 = line[equalFind+1:plusFind] #second variable
             tempString3 = line[plusFind+1:lineEnd] #third variable
-            mem_offset_of_tempString = 1 #placeholder funct.variables[tempString]["mem_loc"][0]
-            mem_offset_of_tempString2 = 1 #placeholder funct.variables[tempString2]["mem_loc"][0]
-            mem_offset_of_tempString3 = 1 #placeholder funct.variables[tempString3]["mem_loc"][0]
+
+            if(tempString.find("[") !=-1): #there is an array in tempString
+                tempNumArray = int(tempString[tempString.find("[")+1: tempString.find("]")])
+            else:
+                tempNumArray = 0
+            if(tempString2.find("[")!= -1):
+                tempNumArray2 = int(tempString2[tempString2.find("[")+1: tempString2.find("]")])
+            else:
+                tempNumArray2 = 0
+            if(tempString3.find("[") != -1):
+                tempNumArray3 = int(tempString3[tempString3.find("[")+1: tempString3.find("]")])
+            else:
+                tempNumArray3 = 0
+
+            mem_offset_of_tempString = funct.variables[tempString]["mem_loc"][tempNumArray]
+            mem_offset_of_tempString2 = funct.variables[tempString2]["mem_loc"][tempNumArray2]
+            mem_offset_of_tempString3 = funct.variables[tempString3]["mem_loc"][tempNumArray3]
+
             if((tempString==tempString2) or (tempString==tempString3)): #x=x+a
                 #print("equal addition")
                 if(tempString == tempString2): #checks to see if x=x+a
-                    AppendString = "movl " + str(mem_offset_of_tempString3)
-                    print(AppendString) #debug
+                    AppendString = "movl " + str(mem_offset_of_tempString3)  +"(%rbp),  %eax"
+
+
                 else: #checks to see if x=a+x
-                    AppendString = "movl " +str(mem_offset_of_tempString2)
-                    print(AppendString) #debug
-                #functs.assem_instrs.append(AppendString)
-                print(AppendString) #debug
+                    AppendString = "movl " +str(mem_offset_of_tempString2) +  "(%rbp), %eax"
+
+                functs.assem_instrs.append(AppendString)
+
                 AppendString = "addl %eax, " + str(mem_offset_of_tempString) +"(%rbp)"
-                #functs.assem_instrs.append(AppendString)
-                print(AppendString) #debug
+                functs.assem_instrs.append(AppendString)
+
 
             else:   #x=z+a
-                print("non equal addition") #debug
+
                 AppendString = "movl "+ str(mem_offset_of_tempString3) + "(%rbp), %edx"
-                #functs.assem_instrs.append(AppendString)
-                print(AppendString) #debug
+                functs.assem_instrs.append(AppendString)
+
                 AppendString = "movl "+ str(mem_offset_of_tempString2) + "(%rbp), %eax"
-                #functs.assem_instrs.append(AppendString)
-                print(AppendString) #debug
+                functs.assem_instrs.append(AppendString)
+
                 AppendString = "addl %edx, %eax"
-                #functs.assem_instrs.append(AppendString)
-                print(AppendString) #debug
+                functs.assem_instrs.append(AppendString)
+
                 AppendString = "movl "+ str(mem_offset_of_tempString) + "(%rbp)"
-                #functs.assem_instrs.append(AppendString)
-                print(AppendString) #debug
+                functs.assem_instrs.append(AppendString)
+
 
             #print("String 1", tempString, " String 2", tempString2, " String 3", tempString3)
 
@@ -189,77 +227,108 @@ def arith_state(out_code, v_code, line_cntr, functs):
             tempString2 = line[equalFind+1:subFind] #second variable
             tempString3 = line[subFind+1:lineEnd] #third variable
 
-            if((tempString3.isnumeric() == 1) and (tempString2 == tempString)): #if x=x+5
-                #print("subtraction \n") #x=x-5
+            if((tempString3.isnumeric() == 1) and (tempString2 == tempString)): #if x=x-5
+
                 tempNum = int(tempString3) #changes third variable into a number
                 mem_offset_of_tempString = 1 #placeholder funct.variables[tempString]["mem_loc"][0]
                 AppendString = "subl $", str(tempNum)+ ", "+str(mem_offset_of_tempString)+ "(%rbp)"
-                print(AppendString) #debug
-                #functs.assem_instrs.append(AppendString)
 
-            elif((tempString3.isnumeric() == 1) and (tempString2 != tempString)): #if x=b+5
-                #print("temp2") ##x=b-5
+                functs.assem_instrs.append(AppendString)
+
+            elif((tempString3.isnumeric() == 1) and (tempString2 != tempString)): #if x=b-5
+
+                if(tempString.find("[") !=-1): #there is an array in tempString
+                    tempNumArray = int(tempString[tempString.find("[")+1: tempString.find("]")])
+                    tempString = tempString[:tempString.find("[")]
+                else:
+                    tempNumArray = 0
+                if(tempString2.find("[")!= -1):
+                    tempNumArray2 = int(tempString2[tempString2.find("[")+1: tempString2.find("]")])
+                    tempString2 = tempString2[:tempString2.find("[")]
+                else:
+                    tempNumArray2 = 0
+
+                mem_offset_of_tempString = funct.variables[tempString]["mem_loc"][tempNumArray]
+                mem_offset_of_tempString2 = funct.variables[tempString2]["mem_loc"][tempNumArray2]
+
                 tempNum = int(tempString3) #changes third variable into a number
-                mem_offset_of_tempString = 1 #placeholder funct.variables[tempString]["mem_loc"][0]
-                mem_offset_of_tempString2 = 1 #placeholder funct.variables[tempString2]["mem_loc"][0]
                 AppendString = "movl "+ str(mem_offset_of_tempString2)+"(%rbp), %eax"
-                #functs.assem_instrs.append(AppendString)
+                functs.assem_instrs.append(AppendString)
                 AppendString = "subl $"+ tempString3 + " %eax"
-                #functs.assem_instrs.append(AppendString)
+                functs.assem_instrs.append(AppendString)
                 AppendString = "movel %eax, "+ str(mem_offset_of_tempString) + "(%rbp)"
-                #functs.assem_instrs.append(AppendString)
+                functs.assem_instrs.append(AppendString)
 
             else:#neither is is numeric
-                #print("subtraction: \n\n")
-                #print("tempString3")
-                mem_offset_of_tempString = 3 #functs.variable funct.variables[tempString]["mem_loc"][0]
-                mem_offset_of_tempString2 = 3 #placeholder funct.variables[tempString2]["mem_loc"][0]
-                mem_offset_of_tempString3 = 3 #placeholder funct.variables[tempString3]["mem_loc"][0]
+                if(tempString.find("[") !=-1): #there is an array in tempString
+                    tempNumArray = int(tempString[tempString.find("[")+1: tempString.find("]")])
+                    tempString = tempString[:tempString.find("[")]
+                    print("ARRAYYY DETECTED IN SUBTRACTION")
+                else:
+                    tempNumArray = 0
+                if(tempString2.find("[")!= -1):
+                    tempNumArray2 = int(tempString2[tempString2.find("[")+1: tempString2.find("]")])
+                    tempString2 = tempString2[:tempString2.find("[")]
+                else: tempNumArray2 = 0
+                if(tempString3.find("[") != -1):
+                    tempNumArray3 = int(tempString3[tempString3.find("[")+1: tempString3.find("]")])
+                    tempString3 = tempString3[:tempString3.find("[")]
+                else:
+                    tempNumArray3 = 0
+
+                mem_offset_of_tempString = funct.variables[tempString]["mem_loc"][tempNumArray]
+                mem_offset_of_tempString2 = funct.variables[tempString2]["mem_loc"][tempNumArray2]
+                mem_offset_of_tempString3 = funct.variables[tempString3]["mem_loc"][tempNumArray3]
+
                 AppendString = "movl "+str(mem_offset_of_tempString2)+ "(%rbp, %eax)"
-                print(AppendString)  #debug
-                #functs.assem_instrs.append(AppendString)
+                functs.assem_instrs.append(AppendString)
                 AppendString = "subl "+str(mem_offset_of_tempString3)+"(%rbp, %eax)"
-                print(AppendString) #debug
-                #functs.assem_instrs.append(AppendString)
+                functs.assem_instrs.append(AppendString)
                 AppendString ="movl %eax, "+str(mem_offset_of_tempString)+"(%rbp)"
-                print(AppendString) #debug
-                #functs.assem_instrs.append(AppendString)'''
+                functs.assem_instrs.append(AppendString)
 
 
         elif(line.find("++")!=-1):
             incrFind = line.find("++") #finds increment
             tempString = line[:incrFind] #variable that is going to be incremented
-            mem_offset_of_tempString = 1 #placeholder funct.variables[tempString]["mem_loc"][0]
+            if(tempString.find("[") !=-1): #there is an array in tempString
+                tempNumArray = int(tempString[tempString.find("[")+1: tempString.find("]")])
+                tempString = tempString[:tempString.find("[")]
+            else:
+                tempNumArray = 0
+
+            mem_offset_of_tempString = funct.variables[tempString]["mem_loc"][tempNumArray]
             AppendString ="addl $1, "+ str(mem_offset_of_tempString) + "(%rbp)"
-            #functs.assem_instrs.append(AppendString) ##needs offset fixing
-            #print(tempString)
-            #print("found increment statement")
+            functs.assem_instrs.append(AppendString)
+
         else: #direct x=y
             if(equalFind != -1): #double check that there is an equal sign
                 tempString = line[:equalFind] #first variable
                 tempString2 = line[equalFind+1:lineEnd] #second variable
-                mem_offset_of_tempString = 1 #placeholder #functs.variables[tempString]["mem_loc"][0] #placeholder
-                mem_offset_of_tempString2 = 1 #placeholder #funct.variables[tempString2]["mem_loc"][0] #gets memory offset of tempString2
-                #print("printing contents of tempstring: ", tempString) #debug
-                #print(functs.variables[tempString], " <== (Were in line:", line_cntr) #debug
+                if(tempString.find("[") !=-1): #there is an array in tempString
+                    tempNumArray = int(tempString[tempString.find("[")+1: tempString.find("]")])
+                    tempString = tempString[:tempString.find("[")]
+                else:
+                    tempNumArray = 0
+                mem_offset_of_tempString = functs.variables[tempString]["mem_loc"][tempNumArray] #placeholder
+
+
                 if(tempString2.isnumeric() == 1): #x=5 for example
-                    #tempNum = int(tempString2) #debug
-                    #print("CONVERTING TO INT", tempNum) #debug
+                    tempNum = int(tempString2)
+
                     AppendString = "movl $"+tempString2+ " "+str(mem_offset_of_tempString)+"(%rbp)"
-                    print(AppendString)
-                    #functs.assem_instrs.append(AppendString)
+                    functs.assem_instrs.append(AppendString)
                 else: #x=b, b is not numeric
-                    #functs.assem_instrs.append("movl ", mem_offset_of_tempString2, "(%rpb), %eax")
-                    #functs.assem_instrs.append("movl %eax ", mem_offset_of_tempString, "(%rbp)")
-                    #print("DIRECT FOUND", tempString, tempString2) #debug
-
-    #for demo
-                    functs.assem_instrs.append(" move to reg ")
-
-    else:
-        print("error") #error state, shouldnt be here
-
-    return functs
+                    if(tempString2.find("[") !=-1): #there is an array in tempString
+                        tempNumArray2 = int(tempString2[tempString2.find("[")+1: tempString2.find("]")])
+                        tempString2 = tempString2[:tempString2.find("[")]
+                    else:
+                        tempNumArray2 = 0
+                    mem_offset_of_tempString2 = funct.variables[tempString2]["mem_loc"][tempNumArray2] #gets memory offset of tempString2
+                    AppendString = "movl "+ str(mem_offset_of_tempString2)+ "(%rpb), %eax"
+                    functs.assem_instrs.append(AppendString)
+                    AppendString = "movl %eax, "+ str(mem_offset_of_tempString)+ "(%rbp)"
+                    functs.assem_instrs.append(AppendString)
 
 def var_dec(out_code, v_code, line_cntr, funct):
     """ types to worry about:
@@ -267,18 +336,16 @@ def var_dec(out_code, v_code, line_cntr, funct):
            declared ints  a = 14
            declared int array a[3] = {1,2,3}"""
 
+
     print("variable declaration")
     print("saldfknalsdfn   ",funct.funct_name)
     line = v_code[line_cntr].rstrip(';\n')
     temp = line.split("int ")[1] #will always be int for our purposes
-    #funct.__init__()
-    #print("vars ", line)
     temp = temp.split(",")
     if '\n' in temp:
         temp.pop('\n')
     if ';' in temp:
         temp.pop(';')
-    print("temp ",temp) #debug
     i = 0
 
     while i < len(temp):
@@ -299,7 +366,6 @@ def var_dec(out_code, v_code, line_cntr, funct):
             vals.append(last_val)
 
         elif '=' in temp[i]: #found a declared int
-            #print("found declared int")  #debug
             var, val = temp[i].split('=')
             vals= [ (int(val)) ]
             funct.mem_offset -= 4
@@ -324,9 +390,8 @@ def var_dec(out_code, v_code, line_cntr, funct):
             arr_mem_offset.append(funct.mem_offset)  #more neg to less neg
             funct.mem_offset += 4
         funct.variables[var]["mem_loc"] = arr_mem_offset
-        #print("var ",var, funct.variables[var]["mem_loc"],"\n")
     funct.mem_offset = temp
-    #print("is this working? ",funct.variables['a']['mem_loc'])
+
 
 
 def funct_call(out_code, v_code, line_cntr, funct):
@@ -335,11 +400,96 @@ def funct_call(out_code, v_code, line_cntr, funct):
     print("function call ",line)
 
 def if_state(out_code, v_code, line_cntr, funct):
+    funct.ifForCounter=funct.ifForCounter+1
     line = v_code[line_cntr]
+    parenStart =line.find("(") #finds first parent
+    parenEnd = line.find(")") #finds second parentheses
+
+    if(line.find("<", parenStart, parenEnd) != -1 ):
+        compareFind = line.find("<")
+        tempString = line[parenStart+1:compareFind]
+        tempString2 = line[compareFind+1:parenEnd]
+        if(tempString.find("[") !=-1): #there is an array in tempString
+            tempNumArray = int(tempString[tempString.find("[")+1: tempString.find("]")])
+            tempString = tempString[:tempString.find("[")]
+        else:
+            tempNumArray = 0
+        mem_offset_of_tempString = funct.variables[tempString]["mem_loc"][tempNumArray]
+
+        if(tempString2.isnumeric()==1):
+            tempNum = int(tempString2)
+            AppendString = "cmpl $" + str(mem_offset_of_tempString) + "(%rbp)"
+
+            funct.assem_instrs.append(AppendString)
+            AppendString = "jg .L"+ str(funct.ifForCounter)
+            funct.assem_instrs.append(AppendString)
+            AppendString = "movl $" + str(mem_offset_of_tempString) + "(%rbp)"
+            funct.assem_instrs.append(AppendString)
+
+
+            AppendString = "L"+ str(funct.ifForCounter) +":"
+            funct.assem_instrs.append(AppendString)
+        else:#no numbers in if statements
+            if(tempString2.find("[") !=-1): #there is an array in tempString
+                tempNumArray2 = int(tempString2[tempString2.find("[")+1: tempString2.find("]")])
+                tempString2 = tempString2[:tempString2.find("[")]
+            else:
+                tempNumArray2 = 0
+            mem_offset_of_tempString2 = funct.variables[tempString2]["mem_loc"][tempNumArray2]
+            AppendString = "movl " + str(mem_offset_of_tempString2) +"(%rbp), %eax"
+            funct.assem_instrs.append(AppendString)
+            AppendString = "cmpl " + str(mem_offset_of_tempString) +"(%rbp), %eax"
+            funct.assem_instrs.append(AppendString)
+            AppendString = "jge .L" + str(funct.ifForCounter)
+            funct.assem_instrs.append(AppendString)
+
+
+
+    elif(line.find(">", parenStart, parenEnd) != -1):
+
+        compareFind = line.find(">")
+        tempString = line[parenStart+1:compareFind]
+        tempString2 = line[compareFind+1:parenEnd]
+        if(tempString.find("[") !=-1): #there is an array in tempString
+            tempNumArray = int(tempString[tempString.find("[")+1: tempString.find("]")])
+            tempString = tempString[:tempString.find("[")]
+        else:
+            tempNumArray = 0
+        mem_offset_of_tempString = funct.variables[tempString]["mem_loc"][tempNumArray]
+
+        if(tempString2.isnumeric()==1):
+            tempNum = int(tempString2)
+            AppendString = "cmpl $" + str(mem_offset_of_tempString) + "(%rbp)"
+
+            funct.assem_instrs.append(AppendString)
+            AppendString = "jle .L"+ str(funct.ifForCounter)
+            funct.assem_instrs.append(AppendString)
+            AppendString = "movl $" + str(mem_offset_of_tempString) + "(%rbp)"
+            funct.assem_instrs.append(AppendString)
+
+
+            AppendString = "L"+ str(funct.ifForCounter) +":"
+            funct.assem_instrs.append(AppendString)
+        else:#no numbers in if statements
+            if(tempString2.find("[") !=-1): #there is an array in tempString
+                tempNumArray2 = int(tempString2[tempString2.find("[")+1: tempString2.find("]")])
+                tempString2 = tempString2[:tempString2.find("[")]
+            else:
+                tempNumArray2 = 0
+            mem_offset_of_tempString2 = funct.variables[tempString2]["mem_loc"][tempNumArray2]
+            AppendString = "movl " + str(mem_offset_of_tempString2) +"(%rbp), %eax"
+            funct.assem_instrs.append(AppendString)
+            AppendString = "cmpl " + str(mem_offset_of_tempString) +"(%rbp), %eax"
+            funct.assem_instrs.append(AppendString)
+            AppendString = "jle .L" + str(funct.ifForCounter)
+            funct.assem_instrs.append(AppendString)
+
     print("found an if state")
 
 def for_loop(out_code, v_code, line_cntr, funct):
     line = v_code[line_cntr]
+
+
     print("found a for loop")
 
 def return_state(out_code, v_code, line_cntr, funct):
@@ -367,6 +517,7 @@ def coarse_parse(out_code, v_code, line_cntr, funct):
         #print("found if statement")
         #out_code << "if_state\n";
         if_state(out_code, v_code, line_cntr, funct)
+        
 
     elif "for" in line:
         #print("found for statement")
