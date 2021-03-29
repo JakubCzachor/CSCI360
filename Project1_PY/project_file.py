@@ -62,8 +62,7 @@ def funct_dec(out_code, v_code, line_cntr, func):
     out_code.write(func.funct_name + ":\n")
     out_code.write(preamble)
 
-    #for i in func.assem_instrs:
-	#    out_code.write("\t" + i + "\n")
+
 
     if not func.is_leaf or func.mem_offset > 128:     #red zone thing
         out_code.write("\tsubq    $" + str(func.mem_offset)+",  %rsp")
@@ -79,7 +78,8 @@ def funct_dec(out_code, v_code, line_cntr, func):
             i+=1
     for line in out_arr:
         out_code.write(line)
-
+    for i in func.assem_instrs:
+        out_code.write("\t" + i + "\n")
     out_code.write( epilogue )
     func.variables.clear()
     #pop all variables from dictionary before returning
