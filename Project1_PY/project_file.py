@@ -82,6 +82,7 @@ def funct_dec(out_code, v_code, line_cntr, func):
         out_code.write("\t" + i + "\n")
     out_code.write( epilogue )
     func.variables.clear()
+    func.assem_instrs = []
     #pop all variables from dictionary before returning
     func.mem_offset = 0
     return out_code, line_cntr
@@ -92,6 +93,11 @@ def arith_state(out_code, v_code, line_cntr, functs):
     lineEnd = line.find(";")
     if (equalFind !=-1): ##checks to make sure that there is an equal sign in the equation
         #print(line_cntr, "THIS IS THE LINE WERE IN") #debug
+
+
+
+        functs.assem_instrs.append("test stuff       asdfasdfasdfsdfsfgsdf")
+
 
         if(line.find("*")!=-1):
             print("Multiplication \n")
@@ -252,6 +258,8 @@ def arith_state(out_code, v_code, line_cntr, functs):
 
     else:
         print("error") #error state, shouldnt be here
+
+    return functs
 
 def var_dec(out_code, v_code, line_cntr, funct):
     """ types to worry about:
