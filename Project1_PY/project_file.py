@@ -86,14 +86,172 @@ def funct_dec(out_code, v_code, line_cntr, func):
     func.mem_offset = 0
     return out_code, line_cntr
 
-def arith_state(out_code, v_code, line_cntr, funct):
+def arith_state(out_code, v_code, line_cntr, functs):
     line = v_code[line_cntr]
-    print("arithmeticing")
+    equalFind = line.find("=")
+    lineEnd = line.find(";")
+    if (equalFind !=-1): ##checks to make sure that there is an equal sign in the equation
+        #print(line_cntr, "THIS IS THE LINE WERE IN") #debug
 
+        if(line.find("*")!=-1):
+            print("Multiplication \n")
+            multFind = line.find("/")
+            tempString = line[:equalFind] #finds string to equal sign (first variable)
+            tempString2 = line[equalFind+1:multFind] #finds second variable
+            tempString3 = line[multFind+1:lineEnd] #finds third variable
+            mem_offset_of_tempString = 1 #placeholder funct.variables[tempString]["mem_loc"][0]
+            mem_offset_of_tempString2 = 1 #placeholder funct.variables[tempString2]["mem_loc"][0]
+            mem_offset_of_tempString3 = 1 #placeholder funct.variables[tempString3]["mem_loc"][0]
+
+            AppendString = "movl "+str(mem_offset_of_tempString3)+"(%rbp), %eax"
+            print(AppendString)#debug
+            #functs.assem_instrs.append(AppendString)
+            AppendString = "imull " + str(mem_offset_of_tempString2) + "(%rbp), %eax"
+            print(AppendString)#debug
+            #functs.assem_instrs.append(AppendString)
+            AppendString = "movl %eax, "+str(mem_offset_of_tempString) +"(%rbp)"
+            print(AppendString)#debug
+            #functs.assem_instrs.append(AppendString)
+
+            #print("String 1", tempString, " String 2", tempString2, " String 3", tempString3)
+
+        elif(line.find("/")!=-1):
+            print("division detected on line", line_cntr," ", line)
+            divFind = line.find("/")
+            tempString = line[:equalFind] #finds first variable
+            tempString2 = line[equalFind+1:divFind] #finds  second variable
+            tempString3 = line[divFind+1:lineEnd] #finds third variable
+            mem_offset_of_tempString = 1 #placeholder funct.variables[tempString]["mem_loc"][0]
+            mem_offset_of_tempString2 = 1 #placeholder funct.variables[tempString2]["mem_loc"][0]
+            mem_offset_of_tempString3 = 1 #placeholder funct.variables[tempString3]["mem_loc"][0]
+            AppendString = "movl "+ str(mem_offset_of_tempString2)+"(%rbp), %eax"
+            print(AppendString)#debug
+            #functs.assem_instrs.append(AppendString)
+            AppendString = "cltd"
+            print(AppendString)#debug
+            #functs.assem_instrs.append(AppendString)
+            AppendString = "idivl " + str(mem_offset_of_tempString3)+"(%rbp)"
+            print(AppendString)#debug
+            #functs.assem_instrs.append(AppendString)
+            AppendString = "movl %eax "+ str(mem_offset_of_tempString) + "(%rbp)"
+            print(AppendString)#debug
+            #functs.assem_instrs.append(AppendString)
+            #print("String 1", tempString, " String 2", tempString2, " String 3", tempString3)
+
+        elif(line.find("+")!=-1 and (line.find("++") ==-1)): #checks to see if addition, and not increment
+            plusFind = line.find("+") #finds + sign
+            tempString = line[:equalFind] #first variable
+            tempString2 = line[equalFind+1:plusFind] #second variable
+            tempString3 = line[plusFind+1:lineEnd] #third variable
+            mem_offset_of_tempString = 1 #placeholder funct.variables[tempString]["mem_loc"][0]
+            mem_offset_of_tempString2 = 1 #placeholder funct.variables[tempString2]["mem_loc"][0]
+            mem_offset_of_tempString3 = 1 #placeholder funct.variables[tempString3]["mem_loc"][0]
+            if((tempString==tempString2) or (tempString==tempString3)): #x=x+a
+                #print("equal addition")
+                if(tempString == tempString2): #checks to see if x=x+a
+                    AppendString = "movl " + str(mem_offset_of_tempString3)
+                    print(AppendString) #debug
+                else: #checks to see if x=a+x
+                    AppendString = "movl " +str(mem_offset_of_tempString2)
+                    print(AppendString) #debug
+                #functs.assem_instrs.append(AppendString)
+                print(AppendString) #debug
+                AppendString = "addl %eax, " + str(mem_offset_of_tempString) +"(%rbp)"
+                #functs.assem_instrs.append(AppendString)
+                print(AppendString) #debug
+
+            else:   #x=z+a
+                print("non equal addition") #debug
+                AppendString = "movl "+ str(mem_offset_of_tempString3) + "(%rbp), %edx"
+                #functs.assem_instrs.append(AppendString)
+                print(AppendString) #debug
+                AppendString = "movl "+ str(mem_offset_of_tempString2) + "(%rbp), %eax"
+                #functs.assem_instrs.append(AppendString)
+                print(AppendString) #debug
+                AppendString = "addl %edx, %eax"
+                #functs.assem_instrs.append(AppendString)
+                print(AppendString) #debug
+                AppendString = "movl "+ str(mem_offset_of_tempString) + "(%rbp)"
+                #functs.assem_instrs.append(AppendString)
+                print(AppendString) #debug
+
+            #print("String 1", tempString, " String 2", tempString2, " String 3", tempString3)
+
+        elif(line.find("-")!=-1): #if subtraction
+            subFind = line.find("-") #finds location of minus sign
+            tempString = line[:equalFind] #first variable
+            tempString2 = line[equalFind+1:subFind] #second variable
+            tempString3 = line[subFind+1:lineEnd] #third variable
+
+            if((tempString3.isnumeric() == 1) and (tempString2 == tempString)): #if x=x+5
+                #print("subtraction \n") #x=x-5
+                tempNum = int(tempString3) #changes third variable into a number
+                mem_offset_of_tempString = 1 #placeholder funct.variables[tempString]["mem_loc"][0]
+                AppendString = "subl $", str(tempNum)+ ", "+str(mem_offset_of_tempString)+ "(%rbp)"
+                print(AppendString) #debug
+                #functs.assem_instrs.append(AppendString)
+
+            elif((tempString3.isnumeric() == 1) and (tempString2 != tempString)): #if x=b+5
+                #print("temp2") ##x=b-5
+                tempNum = int(tempString3) #changes third variable into a number
+                mem_offset_of_tempString = 1 #placeholder funct.variables[tempString]["mem_loc"][0]
+                mem_offset_of_tempString2 = 1 #placeholder funct.variables[tempString2]["mem_loc"][0]
+                AppendString = "movl "+ str(mem_offset_of_tempString2)+"(%rbp), %eax"
+                #functs.assem_instrs.append(AppendString)
+                AppendString = "subl $"+ tempString3 + " %eax"
+                #functs.assem_instrs.append(AppendString)
+                AppendString = "movel %eax, "+ str(mem_offset_of_tempString) + "(%rbp)"
+                #functs.assem_instrs.append(AppendString)
+
+            else:#neither is is numeric
+                #print("subtraction: \n\n")
+                #print("tempString3")
+                mem_offset_of_tempString = 3 #functs.variable funct.variables[tempString]["mem_loc"][0]
+                mem_offset_of_tempString2 = 3 #placeholder funct.variables[tempString2]["mem_loc"][0]
+                mem_offset_of_tempString3 = 3 #placeholder funct.variables[tempString3]["mem_loc"][0]
+                AppendString = "movl "+str(mem_offset_of_tempString2)+ "(%rbp, %eax)"
+                print(AppendString)  #debug
+                #functs.assem_instrs.append(AppendString)
+                AppendString = "subl "+str(mem_offset_of_tempString3)+"(%rbp, %eax)"
+                print(AppendString) #debug
+                #functs.assem_instrs.append(AppendString)
+                AppendString ="movl %eax, "+str(mem_offset_of_tempString)+"(%rbp)"
+                print(AppendString) #debug
+                #functs.assem_instrs.append(AppendString)'''
+
+
+        elif(line.find("++")!=-1):
+            incrFind = line.find("++") #finds increment
+            tempString = line[:incrFind] #variable that is going to be incremented
+            mem_offset_of_tempString = 1 #placeholder funct.variables[tempString]["mem_loc"][0]
+            AppendString ="addl $1, "+ str(mem_offset_of_tempString) + "(%rbp)"
+            #functs.assem_instrs.append(AppendString) ##needs offset fixing
+            #print(tempString)
+            #print("found increment statement")
+        else: #direct x=y
+            if(equalFind != -1): #double check that there is an equal sign
+                tempString = line[:equalFind] #first variable
+                tempString2 = line[equalFind+1:lineEnd] #second variable
+                mem_offset_of_tempString = 1 #placeholder #functs.variables[tempString]["mem_loc"][0] #placeholder
+                mem_offset_of_tempString2 = 1 #placeholder #funct.variables[tempString2]["mem_loc"][0] #gets memory offset of tempString2
+                #print("printing contents of tempstring: ", tempString) #debug
+                #print(functs.variables[tempString], " <== (Were in line:", line_cntr) #debug
+                if(tempString2.isnumeric() == 1): #x=5 for example
+                    #tempNum = int(tempString2) #debug
+                    #print("CONVERTING TO INT", tempNum) #debug
+                    AppendString = "movl $"+tempString2+ " "+str(mem_offset_of_tempString)+"(%rbp)"
+                    print(AppendString)
+                    #functs.assem_instrs.append(AppendString)
+                else: #x=b, b is not numeric
+                    #functs.assem_instrs.append("movl ", mem_offset_of_tempString2, "(%rpb), %eax")
+                    #functs.assem_instrs.append("movl %eax ", mem_offset_of_tempString, "(%rbp)")
+                    #print("DIRECT FOUND", tempString, tempString2) #debug
 
     #for demo
-    funct.assem_instrs.append(" move to reg ")
+                    functs.assem_instrs.append(" move to reg ")
 
+    else:
+        print("error") #error state, shouldnt be here
 
 def var_dec(out_code, v_code, line_cntr, funct):
     """ types to worry about:
