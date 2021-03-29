@@ -219,6 +219,8 @@ def coarse_parse(out_code, v_code, line_cntr, funct):
         out_code, line_cntr = funct_dec(out_code, v_code, line_cntr,funct);
 
     # found arithmetic instructions
+    elif '}' in line and '{' not in line:
+        pass
     else:
         #print(("found arithmetic statement"))
         #cout << "arithmetic instr\n";
