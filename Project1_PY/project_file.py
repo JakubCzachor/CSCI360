@@ -443,6 +443,9 @@ def if_state(out_code, v_code, line_cntr, funct):
             AppendString = "jge .L" + str(funct.ifForCounter)
             funct.assem_instrs.append(AppendString)
 
+        AppendString = "L"+ str(funct.isForCounter) + ": "
+        funct.assem_instrs.append(AppendString)
+
 
 
     elif(line.find(">", parenStart, parenEnd) != -1):
@@ -487,10 +490,48 @@ def if_state(out_code, v_code, line_cntr, funct):
     print("found an if state")
 
 def for_loop(out_code, v_code, line_cntr, funct):
+    funct.ifForCounter+=1
     line = v_code[line_cntr]
-
-
-    print("found a for loop")
+    findEqual=line.find("=")
+    firstColon = line.find(";")
+    secondColon = line.find(";",firstColon+1, len(line)) #finds second firstColon
+    endLineLoop = line.find(")")
+    if(line.find("<")):
+        findCompare = line.find("<")
+    if(line.find(">")):
+        findCompare = line.find(">")
+    findINT =line.find("int")
+    tempString = line[findINT+3:findEqual] #int i
+    tempString2 = line[findEqual+1:firstColon] # 5 in int i =5
+    tempString3 = line[firstColon+1:findCompare] #i in i<8
+    tempString4 = line[findCompare+1:secondColon] #8 in i<8
+    tempString5 = line[secondColon+1:endLineLoop] #i++
+    mem_offset_of_tempString = funct.variables[tempString]["mem_loc"][tempNumArray]
+    if(tempString2.isnumeric() == 1): #if i=5
+        tempNum2 = int(tempString2)
+        AppendString  = "movl $" + tempNum2  + ", " + mem_offset_of_tempString +"(%rbp)"
+        AppendString  = "jmp .L" +str(funct.ifForCounter)
+        funct.ifForCounter+=1
+        AppendString = "L" + str(funct.ifForCounter)+":"
+    else:
+        if(tempString2.find("[") == 1): #if i=b[x]
+            tempStringArray2 = tempString2[:tempString2.find("[")]
+            tempNumArray2 = int(tempString2[tempString2.find("[")+1:tempString2.find("]")])
+        else:#if i=b
+            tempNumArray2 = 0
+        mem_offset_of_tempString2 = funct.variables[tempString2]["mem_loc"][tempNumArray2]
+    if(tempString == tempString3):
+        if(tempString4.isnumeric()==1):
+            tempNum4 = int(tempString4)
+        else:
+            if(tempString4.find("[") == 1): #if i<b[x]
+                tempStringArray4 = tempString4[:tempString4.find("[")]
+                tempNumArray4 = int(tempString4[tempString4.find("[")+1:tempString4.find("]")])
+            else:#if i<b
+                tempNumArray4 = 0
+            mem_offset_of_tempString4 = funct.variables[tempString2]["mem_loc"][tempNumArray2]
+    if(tempString5 == tempString1+"++"):
+        print("found a for loop")
 
 def return_state(out_code, v_code, line_cntr, funct):
     line = v_code[line_cntr]
@@ -517,7 +558,7 @@ def coarse_parse(out_code, v_code, line_cntr, funct):
         #print("found if statement")
         #out_code << "if_state\n";
         if_state(out_code, v_code, line_cntr, funct)
-        
+
 
     elif "for" in line:
         #print("found for statement")
